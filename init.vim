@@ -1,3 +1,7 @@
+" let g:python3_host_prog =substitute(system('which python3'), '\n', '', '')
+"let g:python3_host_prog = '/usr/bin/python3'
+let g:python3_host_prog =substitute(system('which python3'), '\n', '', '')
+
 let g:session_autoload = 'no'
 let $MYVIMRC = expand("<sfile>:p")
 let mapleader=","
@@ -46,8 +50,11 @@ call plug#begin('~/.local/share/nvim/plugged')
   Plug 'junegunn/vim-easy-align'
 
   " Snippets
-  Plug 'SirVer/ultisnips'
-
+  if !empty(g:python3_host_prog)
+    Plug 'SirVer/ultisnips'
+  else
+    echo "Python 3 not found.  Ultisnips plugin will not be loaded"
+  endif
   " Folding
   " Plug 'Konfekt/FastFold'
 
@@ -97,7 +104,7 @@ call plug#begin('~/.local/share/nvim/plugged')
 call plug#end()
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"                  Customize Configuration of various plugins                  "
+"                  Customize Configuration of various plugins                  
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let $VIMRCHOME= fnamemodify($MYVIMRC, ":h").'/'
 

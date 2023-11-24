@@ -1,0 +1,280 @@
+global !p
+from datetime import datetime
+import uuid
+def date_now():
+	try:
+		import tzlocal
+		return datetime.now(tzlocal.get_localzone()).strftime("%Y-%m-%d %H:%M")
+	except:
+		return "'pip install tzlocal' required before this will work"
+
+def suuid():
+	return str(uuid.uuid4().hex)[0:5]
+
+def from_options(t, options):
+	if t:
+		options = [m[len(t):] for m in options if m.startswith(t)]
+	if len(options) == 1:
+		return options[0]
+	else:
+		return "(" + "|".join(options) + ")"
+
+endglobal
+
+snippet 'rep (\d+) (\w+)' "Repeat" r
+`!p snip.rv = int(match.group(1))*match.group(2)`
+endsnippet
+
+snippet defect "defect found in test" b
+-------------------------------------------------------------------------------
+*Defect*   ${1:Defect Number - Test Section Number} (${2:Name Of Test})
+*Date*     ${3:`!p snip.rv = date_now()`}
+*Id*       `!p
+if not snip.c:
+  snip.rv = suuid()`
+*Severity* $4`!p snip.rv=from_options(t[4], ['critical','major','minor','trivial'])`
+-------------------------------------------------------------------------------
+*Symptoms*
+$6
+
+-------------------------------------------------------------------------------
+*Reproduction Steps*
+$7
+
+-------------------------------------------------------------------------------
+endsnippet
+
+snippet date "write the date"
+`!p snip.rv = date_now()`
+endsnippet
+
+snippet change "change log" b
+-------------------------------------------------------------------------------
+*${1:XGW}*   v${2:major}.${3:minor}.${4:build}
+*Date*     ${5:`!p snip.rv = date_now()`}
+*Hash*     $6
+-------------------------------------------------------------------------------
+*Improvments:*
+$7
+
+-------------------------------------------------------------------------------
+*Fixed Issues:*
+$8
+
+-------------------------------------------------------------------------------
+endsnippet
+
+snippet 'rep (\d+) (\w+)' "Repeat" r
+`!p snip.rv = int(match.group(1))*match.group(2)`
+endsnippet
+
+snippet troub "trouble shooting methodology" !b
+*${1:${VISUAL:name_of_investigation}}*
+= Observer ([[local:`!v substitute(substitute(substitute(execute('echo $MYVIMRC'),'\\.vimrc', '', 'g'), '\', '/', "g"), "\n", "", "g")`/ooda.pdf|diagram]]) = 
+== Evidence ([[evidence.`!p snip.rv = snip.basename`|evidence]]) ==
+
+  *What defines Success?:* ([[subgoals.`!p 
+from pathlib import Path
+target_dir = Path(path).parent
+os.chdir(str(target_dir))
+goals_path = 'subgoals.' + snip.basename + '.wiki'
+if not (Path('.') / goals_path).exists():
+	with open("./"+goals_path, "w") as fp:
+		fp.write("[[{}|back]]\n".format(snip.basename))
+		fp.write("= Subgoals =\n")
+		fp.write("* [ ] \n")
+snip.rv = snip.basename
+`|subgoals]])
+		${2:what is your primary goal}
+
+  *What is the problem?*
+		${3:what seems to be the problem?}
+
+	*Discoveries:* ([[notes.`!p snip.rv = snip.basename`|notes]])
+	
+= Orient =
+  *Symptoms:* [[symptoms.`!p snip.rv = snip.basename`|symptoms]]
+
+== Questions ==
+
+  *Assumptions (at first invisible)*
+    To find your assumptions, look for two pieces of evidence that contradict
+    each other. (may have to wait a couple of loops)
+    * [ ] 
+
+  *Questions for $1*
+  === Pre trouble-shooting questions ===
+    * [ ] Do you have enough information?
+    * [ ] Is your information organized?
+    * [ ] Can you draw a diagram of the components and their interactions?
+    * [ ] Do you need to write some code to make it easier to see?
+    * [ ] Can you think of anyway to speed up your feedback cycle?
+
+    * [ ] Is it a repair or a pioneering problem?  Did it work once before, or did it
+          work somewhere else?  Yes: Repair, No: Pioneering.
+
+  === Repair (Complexity increases exponentially) ===
+    * [ ] Can you test the individual components to reduce complexity?
+    * [ ] Can you exchange components?
+    * [ ] Can you reduce the number of interactions?
+    * [ ] Are you continuing event though you know that something you have previously
+          tested isn't working?
+    * [ ] Has a thing you have previously tested fooled you into thinking it works,
+          when it doesn't work? (Never assume something is right before you have
+          checked it twice)
+
+  == Pioneering ==
+    * [ ] Has someone else solved this before (search)? Can you turn this into a
+          repair?
+    * [ ] Do you have something to baseline from?
+    * [ ] Looking under the problem, are you focused on the right goals?  Are you
+          stuck on solving a hard problem, when there is an easy problem?
+    * [ ] Do you understand how your existing system works?  If not, can you draw
+          diagrams and describe how it works before you continue?
+    * [ ] What don't you know that you need to know?
+
+  == Custom Questions: (>=5) ==
+    * [ ] 
+    * [ ] 
+    * [ ] 
+    * [ ] 
+    * [ ] 
+
+= Decide =
+  [[#Questions]]
+  *Research Needed For?:*
+    $4
+
+  [[#Questions]]
+  *Idea/Hypotheses for $1: >=5*
+  * [ ] $5
+  * [ ] $6
+  * [ ] $7
+  * [ ] $8
+  * [ ] $9
+
+  *Chosen Research-Goal/Hypothesis*
+    $0
+
+== Plan ([[plan.`!p snip.rv = snip.basename`|plan]]) ==
+
+= Act =
+  
+
+endsnippet
+snippet questions ""
+  *Assumptions (at first invisible)*
+    To find your assumptions, look for two peices of evidence that contradict
+    each other. (may have to wait a couple of loops)
+
+  *Questions for $1:*
+  === Pre trouble-shooting questions ===
+    * [ ] Do you have enough information?
+    * [ ] Is your information organized?
+    * [ ] Can you draw a diagram of the components and their interactions?
+    * [ ] Do you need to write some code to make it easier to see?
+    * [ ] Can you think of anyway to speed up your feedback cycle?
+
+    * [ ] Is it a repair or a pioneering problem?  Did it work once before, or did it
+          work somewhere else?  Yes: Repair, No: Pioneering.
+
+  === Repair (Complexity increases exponentially) ===
+    * [ ] Can you test the individual components to reduce complexity?
+    * [ ] Can you exchange components?
+    * [ ] Can you reduce the number of interactions?
+    * [ ] Are you continuing event though you know that something you have previously
+          tested isn't working?
+    * [ ] Has a thing you have previously tested fooled you into thinking it works,
+          when it doesn't work? (Never assume something is right before you have
+          checked it twice)
+
+  == Pioneering ==
+    * [ ] Has someone else solved this before (search)? Can you turn this into a
+          repair?
+    * [ ] Do you have something to baseline from?
+    * [ ] Looking under the problem, are you focused on the right goals?  Are you
+          stuck on solving a hard problem, when there is an easy problem?
+    * [ ] Do you understand how your existing system works?  If not, can you draw
+          diagrams and describe how it works before you continue?
+    * [ ] What don't you know that you need to know?
+
+  == Custom Questions: (>=5) ==
+    * [ ] 
+    * [ ] 
+    * [ ] 
+    * [ ] 
+    * [ ] 
+endsnippet
+
+snippet goal ""
+${VISUAL} [[`!p
+import os
+from pathlib import Path
+text = snip.v.text.replace(" ", "_")
+text = text.replace("?", "")
+text = text.rstrip()
+file_name = text + '.wiki'
+current_dir = Path.cwd()
+target_dir = Path(path).parent
+os.chdir(str(target_dir))
+with open(file_name, "w") as fp:
+	fp.write("[[{}|back]]\n".format(snip.basename))
+	title = text.replace("_", " ")
+	words = [word.capitalize() for word in title.split(" ")]
+	title = " ".join(words)
+	fp.write("{}\n".format(title))
+os.chdir(str(current_dir))
+snip.rv = "{}|link]]".format(text)`$0
+endsnippet
+
+
+snippet uuid "UUID" !b
+`!p import uuid
+if not snip.c:
+  snip.rv = uuid.uuid4().hex`
+endsnippet
+
+snippet uncheck "uncheck"
+&#9744;
+endsnippet
+
+snippet check "uncheck"
+&#9745;
+endsnippet
+
+snippet newpage "newpage" !b
+<p style="page-break-before: always" ></p>
+endsnippet
+
+snippet np "newpage" !b
+<p style="page-break-before: always" ></p>
+endsnippet
+
+snippet admon "admonition" !b
+!!! $1`!p snip.rv=from_options(t[1], ['summary', 'note', 'success', 'failure', 'warning', 'danger'])`
+		${2:contents of admonition}
+endsnippet
+
+snippet code "code" !b
+{% raw %}
+\`\`\`${1:syntax}
+$2
+\`\`\`
+{% endraw %}
+endsnippet
+
+snippet image "image" !b
+<div class="img-box">
+		<img src="./../assets/$1" alt="$2"/>
+</div>
+$0
+endsnippet
+
+snippet '' "keyword"
+\`\`$1\`\` $0
+endsnippet
+
+
+snippet link "link"
+[$1]($0)
+endsnippet

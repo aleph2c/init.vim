@@ -1,0 +1,311 @@
+# =======
+# chapter  (not in rst, but in Jessica's theme)
+# =======
+
+# sec (section in rst)
+# ===
+
+# sub (subsection in rst)
+# ---
+
+# ssub (subsubsection in rst)
+# ^^^^
+
+# sssub (paragraph in rst)
+# ,,,,,
+
+
+
+global !p
+import re
+import datetime
+def hypertarget(filename, t):
+  return '..' ' _' + filename + '__' + re.sub(r'([ ?]{1,})', '_', t).lower() + ':'
+
+def captalize_words(t):
+	return " ".join([word.capitalize() for word in t.split()])
+
+def current_date():
+	now = datetime.datetime.now()
+	return now.strftime("%Y-%m-%d")
+
+def from_options(t, options):
+	if t:
+		options = [m[len(t):] for m in options if m.startswith(t)]
+	if len(options) == 1:
+		return options[0]
+	else:
+		return "(" + "|".join(options) + ")"
+endglobal
+
+
+
+snippet abr "abbreviation" 
+:abbr:\`${1:short}(${2:the long form})\`
+endsnippet
+
+snippet code "code block" b
+.. code-block:: ${1:python}
+
+  $2
+endsnippet
+
+snippet codel "code block with lines and emphasis" b
+.. code-block:: ${1:python}
+  :emphasize-lines: 1
+  :linenos:
+
+  $2
+endsnippet
+
+snippet "part" "Writing a part header" rb
+${2:`!p snip.rv = hypertarget(snip.basename, t[1])`}
+
+${1:${VISUAL:section_title}}
+${3:`!p snip.rv = '#' * len(t[1])`}
+
+$0
+endsnippet
+
+snippet "\#\#" "Writing a chapter header" rb
+${2:`!p snip.rv = hypertarget(snip.basename, t[1])`}
+
+${1:${VISUAL:section_title}}
+${3:`!p snip.rv = '#' * (len(t[1]))`}
+
+$0
+endsnippet
+
+snippet "chapter" "Writing a chapter header" rb
+#${2:`!p snip.rv = hypertarget(snip.basename, t[1])`}
+
+#${4:`!p snip.rv = '#' * (len(t[1]) + 1)`}
+# ${1:${VISUAL:section_title}}
+#${3:`!p snip.rv = '#' * (len(t[1]) + 1)`}
+
+$0
+endsnippet
+
+snippet "\=\=" "Writing a section header" rb
+${2:`!p snip.rv = hypertarget(snip.basename, t[1])`}
+
+${1:${VISUAL:section_title}}
+${3:`!p snip.rv = '=' * len(t[1])`}
+
+$0
+endsnippet
+
+snippet "sec" "Writing a section header" rb
+${2:`!p snip.rv = hypertarget(snip.basename, t[1])`}
+
+${1:${VISUAL:section_title}}
+${3:`!p snip.rv = '=' * len(t[1])`}
+
+$0
+endsnippet
+
+snippet "\*\*" "Writing a subtitle" rb
+`!p snip.rv = hypertarget(snip.basename, t[1])`
+
+${1:${VISUAL:subsection title}}
+`!p snip.rv = '*' * len(t[1])`
+$0
+endsnippet
+
+snippet "sub" "Writing a subtitle" rb
+`!p snip.rv = hypertarget(snip.basename, t[1])`
+
+${1:${VISUAL:subsection title}}
+`!p snip.rv = '*' * len(t[1])`
+$0
+endsnippet
+
+snippet "\-\-" "Writing a subsubtitle" rb
+`!p snip.rv = hypertarget(snip.basename, t[1])`
+
+${1:${VISUAL:subsubsection_title}}
+`!p snip.rv = '-' * len(t[1])`
+$0
+endsnippet
+
+snippet "ssub" "Writing a subtitle" rb
+`!p snip.rv = hypertarget(snip.basename, t[1])`
+
+${1:${VISUAL:subsubsection_title}}
+`!p snip.rv = '-' * len(t[1])`
+$0
+endsnippet
+
+snippet "\^\^" "Writing a subsubsubtitle" rb
+`!p snip.rv = hypertarget(snip.basename, t[1])`
+
+${1:${VISUAL:subsubsubsection_title}}
+`!p snip.rv = '^' * len(t[1])`
+$0
+endsnippet
+
+snippet "sssub" "Writing a subtitle" rb
+`!p snip.rv = hypertarget(snip.basename, t[1])`
+
+${1:${VISUAL:subsubsubsection_title}}
+`!p snip.rv = '^' * len(t[1])`
+$0
+endsnippet
+
+snippet "\"\"" "Writing a subtitle" rb
+`!p snip.rv = hypertarget(snip.basename, t[1])`
+
+${1:${VISUAL:subsubsubsection_title}}
+`!p snip.rv = '"' * len(t[1])`
+$0
+endsnippet
+
+snippet "ssssub" "Writing a subtitle" rb
+`!p snip.rv = hypertarget(snip.basename, t[1])`
+
+${1:${VISUAL:subsubsubsection_title}}
+`!p snip.rv = '"' * len(t[1])`
+$0
+endsnippet
+
+snippet glos "Write a glossary item" b
+	 ${1:name of item}
+			${2:Description of $1}
+
+$0
+endsnippet
+
+snippet toc "add a submenu" b
+.. toctree::
+   :maxdepth: 2
+
+   $1
+endsnippet
+
+snippet contents "add a table of contents" b
+.. contents::
+   :depth: $1
+   :local:
+   :backlinks: none
+   :class: page-toc
+endsnippet
+
+#snippet term "reference a glossary item" 
+#:term:\`${1:name} <${2:`!p snip.rv = captalize_words(t[1])`}>\`
+#endsnippet
+
+snippet term "reference a glossary item" 
+:term:\`${1:${VISUAL:name}}`
+endsnippet
+
+snippet ref "reference to a link"
+:ref:\`${1:name} <${2:name of link}>\`
+endsnippet
+
+snippet link "create a link"
+\`$1 <$2>\`_
+endsnippet
+
+# 
+#    :class: $3`!p snip.rv=from_options(t[3], ['scale-to-fit', 'noscale-center', 'noscale-left', 'noscale-left-wrap', 'noscale-right-wrap'])`
+    
+snippet image "Add an image" b
+.. figure:: /_static/$1.svg
+    :target: /_static/$1.pdf
+    :class: noscale-center white-bg
+
+    source file: \`\`_static/$1.uxf\`\`
+$0
+endsnippet
+
+snippet video "Add a video" b
+.. raw:: html
+
+  <div class="video-content">
+    <iframe src="$1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+
+$0
+endsnippet
+
+snippet note "Add a note" b
+.. note::
+
+  $0
+endsnippet
+
+snippet '' "fixed text"
+\`\`$1\`\` $0
+endsnippet
+
+snippet ttr "Things to Remember" b
+.. admonition:: Things to Remember
+
+  $0
+endsnippet
+
+snippet comment "Comment" b
+.. admonition:: Scott Volk: `!p snip.rv = current_date()`
+
+  $0
+endsnippet
+
+# boiler plate for question 1
+snippet question1 "write question html infrastructure" b
+${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(1))[4:-1]`>`}
+${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(1))`}
+**${1:${VISUAL:type your question here}}?**
+.. include:: i_navigation_1.rst
+$0
+endsnippet
+
+# boiler plate for question 2
+snippet question2 "write question html infrastructure" b
+${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(2))[4:-1]`>`}
+${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(2))`}
+**${1:${VISUAL:type your question here}}?**
+.. include:: i_navigation_2.rst
+$0
+endsnippet
+
+# boiler plate for question 3
+snippet question3 "write question html infrastructure" b
+${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(3))[4:-1]`>`}
+${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(3))`}
+**${1:${VISUAL:type your question here}}?**
+.. include:: i_navigation_3.rst
+$0
+endsnippet
+
+# boiler plate for question 4
+snippet question4 "write question html infrastructure" b
+${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(4))[4:-1]`>`}
+${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(4))`}
+**${1:${VISUAL:type your question here}}?**
+.. include:: i_navigation_4.rst
+$0
+endsnippet
+
+# boiler plate for question 5
+snippet question5 "write question html infrastructure" b
+${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(5))[4:-1]`>`}
+${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(5))`}
+**${1:${VISUAL:type your question here}}?**
+.. include:: i_navigation_5.rst
+$0
+endsnippet
+
+
+# boiler plate for question 6
+snippet question6 "write question html infrastructure" b
+${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(6))[4:-1]`>`}
+${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(6))`}
+**${1:${VISUAL:type your question here}}?**
+.. include:: i_navigation_6.rst
+$0
+endsnippet
+
+snippet date "Insert current date" b
+#snippet date "Insert current date" iA
+\`\``!v strftime("%Y-%m-%d")`\`\`
+endsnippet

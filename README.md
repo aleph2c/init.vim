@@ -1,0 +1,2 @@
+# init.vim
+nvim configuration

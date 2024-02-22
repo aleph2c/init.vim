@@ -97,11 +97,14 @@ call plug#begin('~/.local/share/nvim/plugged')
   Plug 'tpope/vim-eunuch'
   Plug 'terryma/vim-multiple-cursors'
   Plug 'yanqd0/nginx.vim'
+  Plug 'arouene/vim-matchit'
 
   " Refactoring
   Plug 'python-rope/ropevim'
 
 call plug#end()
+
+packadd! matchit
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                  Customize Configuration of various plugins                  

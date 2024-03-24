@@ -532,7 +532,7 @@ def f_args(arguments):
 		if arg == '*args':
 			string1  = "       | \`\`%s\`\`: variable length arguement list" % (arg)
 		elif arg == '**kwargs':
-			string1  = "       | \`\`%s\`\`: arbitrary keyword arguements" % (arg)
+			string1  = "       | \`\`%s\`\`: arbitrary keyword arguments" % (arg)
 		elif arg == 'live_trace=None':
 			string1  = "       | \`\`%s\`\`: enable live_trace feature?" % (arg)
 		elif arg == 'live_spy=None':
@@ -694,5 +694,131 @@ snippet payload "created namedtuple payload" b
 ${1:NamedPayload} = \
   namedtuple('$1', ['$2', $0 ])
 endsnippet
+
+snippet comment1 "Google style docstring" b
+`!p
+import re
+from functools import partial
+
+def debug(thing):
+    # to debug: debug(<var>)
+    # then
+    # tail -f /tmp/ultisnips_debug.log
+    with open("/tmp/ultisnips_debug.log", "a") as f:
+       f.write("Debug info: {}\n".format(thing))
+
+def _spaces(number=1):
+    return " " * number
+
+def _line(value, spaces=None):
+    if spaces:
+       string = spaces() + value
+    else:
+       string = value
+    return string
+
+def parse_class(snip):
+    row = int(snip.snippet_start[0]) - 1
+    line = snip.buffer[row]
+    spaces = 4
+    match = re.match(r"^class\s+(\w+)\(([\w\s,]*)\):", line)
+    if match:
+        class_name, base_classes_list = match.groups()
+        spcs = partial(_spaces, number=4)
+        _l = partial(_line, spaces=spcs)
+    else:
+        snip.rv = "Class signature parsing failed."
+        return
+    bases = [base.strip() for base in base_classes_list.split(",")]
+    docstring = "\"\"\"\n"
+    docstring += _l(f"A brief description of {class_name}\n")
+    docstring += "\n"
+    docstring += _l(f"A longer description of the purpose the the class\n")
+    docstring += "\n"
+    docstring += _l("\"\"\"")
+    snip.rv = docstring
+
+def parse_function_def(snip):
+    # Initialize variables
+    func_name = arg_list = ""
+    found = False
+    accumlated_lines = []
+    row = int(snip.snippet_start[0]) - 1
+
+    # Search upwards for the function definition
+    while row >= 0 and not found:
+        line = snip.buffer[row]
+        pattern = r"^(\s*)def"
+        match = re.match(pattern, line)
+        if match:
+            spaces = match.group()
+            spcs = partial(_spaces, number=len(spaces)+4)
+            found = True
+            # Continue accumulating lines until the line with "):" is found
+            # indicating the end of the function or method
+            while row < len(snip.buffer) and not re.search(r"\):", line):
+                accumlated_lines.append(line.strip())
+                row += 1
+                line = snip.buffer[row]
+            accumlated_lines.append(line.strip())
+        row -= 1
+
+    if not found or not accumlated_lines:
+        snip.rv = "Function definition not found."
+        return
+
+    function_def = " ".join(accumlated_lines)
+
+    match = re.match(r"def (\w+)\((.*?)\):", function_def)
+    if match:
+        func_name, arg_list = match.groups()
+        spcs = partial(_spaces, number=len(spaces)+4)
+        espcs = partial(_spaces, number=len(spaces)+1)
+        _l = partial(_line, spaces=spcs)
+        _e = partial(_line, spaces=espcs)
+    else:
+        snip.rv = "Function signature parsing failed."
+        return
+
+    # Process arguments list
+    args = [arg.strip() for arg in arg_list.split(",")]
+
+    # Generate docstring template
+    docstring = f"\"\"\"short description\n\n"
+    docstring += _l("longer description\n")
+    docstring += "\n"
+    docstring += _l("**Note**:\n")
+    docstring += _l("    Do this not that recommendation\n")
+    docstring += "\n"
+    if args:
+        docstring += _l("**Args**:\n")
+        for arg in args:
+            if arg and arg != "self":
+                if arg == '**kwargs':
+                   docstring += _l(f"    |\'\'{arg}\'\' (dict): arbitrary keyword arguments\n")
+                elif arg == '*args':
+                   docstring += _l(f"    |\'\'{arg}\'\' (dict): variable length argument list\n")
+                elif arg == '*':
+                   pass
+                else:
+                   docstring += _l(f"    |\'\'{arg}\'\' (type): \n")
+    docstring += "\n"
+    docstring += _l("Returns:\n")
+    docstring += _l("    (type): \n\n")
+    docstring += _l("**Example(s)**:\n\n")
+    docstring += _l("    .. code-block:: python\n\n")
+    docstring += _l("    # example code goes here\n\n")
+    docstring += _e("\"\"\"")
+
+    snip.rv = docstring
+
+row = int(snip.snippet_start[0]) - 1
+if "class" in snip.buffer[row]:
+    parse_class(snip)
+else:
+    parse_function_def(snip)
+`
+endsnippet
+
 
 # vim:ft=snippets:

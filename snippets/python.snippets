@@ -543,87 +543,87 @@ snip.rv='super().__init__(name, live_trace=live_trace, live_spy=live_spy)' if is
   'super().__init__(name, live_trace, live_spy)'`
 endsnippet
 
-snippet '''comment''' "factory or ifactory comment"
-'''$0`!p
-def f_args(arguments):
-  index = 1
-  # we add the '|' to make the arg lists appear on seperate lines.
-  # (I'm starting to wonder about rst... it fills the code with clutter and
-  # distracting garbage)
-  for arg in arguments:
-    if arg == '*args':
-      string1  = "       | \`\`%s\`\`: variable length arguement list" % (arg)
-    elif arg == '**kwargs':
-      string1  = "       | \`\`%s\`\`: arbitrary keyword arguements" % (arg)
-    elif arg == 'live_trace=None':
-      string2  = "       | \`\`%s\`\`: enable live_trace feature?" % (arg)
-    elif arg == 'live_spy=None':
-      string1  = "       | \`\`%s\`\`: enable live_spy feature?" % (arg)
-    else:
-      string1  = "       | \`\`%s\`\` (type1): " % (arg)
-    yield (string1)
-    index += 1
-
-if not snip.c:
-  row, col = vim.current.window.cursor
-  previous_line=snip.buffer[int(row)-2]
-  m1 = re.search('__init__(\(.+)\)', previous_line)
-  m2 = re.search('.+?\((.+)\)', previous_line)
-  if m1 != None and len(m1.groups()) == 1:
-    args = m1.group(1).split(',')[1:]
-    args = [arg.strip() for arg in args if arg]
-    tags = f_args(args)
-    snip.rv = "short description\n"
-    snip.rv += "\n"
-    snip.rv += "    longer description\n"
-    snip.rv += "\n"
-    snip.rv += "    **Note**:\n"
-    snip.rv += "       Do this not that recommendation\n"
-    snip.rv += "\n"
-    snip.rv += "    **Args**:\n"
-    for tag in tags:
-      snip.rv += tag + "\n"
-    snip.rv += "\n\n"
-    snip.rv += "    **Returns**:\n"
-    snip.rv += "       (type): \n"
-    snip.rv += "\n"
-    snip.rv += "    **Example(s)**:\n"
-    snip.rv += "      \n"
-    snip.rv += "    .. code-block:: python\n"
-    snip.rv += "       \n"
-    snip.rv += "       # example code goes here"
-    snip.rv += "\n"
-    snip += ''
-  elif m2 != None and len(m2.groups()) == 1:
-    args = m2.group(1).split(',')[0:]
-    args = [arg.strip() for arg in args if arg]
-    if args[0] == 'self':
-      args = args[1:]
-    tags = f_args(args)
-    snip.rv = "short description\n"
-    snip.rv += "\n"
-    snip.rv += "    longer description\n"
-    snip.rv += "\n"
-    snip.rv += "    **Note**:\n"
-    snip.rv += "       Do this not that recommendation\n"
-    snip.rv += "\n"
-    snip.rv += "    **Args**:\n"
-    for tag in tags:
-      snip.rv += tag + "\n"
-    snip.rv += "\n\n"
-    snip.rv += "    **Returns**:\n"
-    snip.rv += "       (type): \n"
-    snip.rv += "\n"
-    snip.rv += "    **Example(s)**:\n"
-    snip.rv += "      \n"
-    snip.rv += "    .. code-block:: python\n"
-    snip.rv += "       \n"
-    snip.rv += "       # example code goes here"
-    snip.rv += "\n"
-    snip += ''
-    
-`'''
-endsnippet
+#snippet '''comment''' "factory or ifactory comment"
+#'''$0`!p
+#def f_args(arguments):
+#  index = 1
+#  # we add the '|' to make the arg lists appear on seperate lines.
+#  # (I'm starting to wonder about rst... it fills the code with clutter and
+#  # distracting garbage)
+#  for arg in arguments:
+#    if arg == '*args':
+#      string1  = "       | \`\`%s\`\`: variable length arguement list" % (arg)
+#    elif arg == '**kwargs':
+#      string1  = "       | \`\`%s\`\`: arbitrary keyword arguements" % (arg)
+#    elif arg == 'live_trace=None':
+#      string2  = "       | \`\`%s\`\`: enable live_trace feature?" % (arg)
+#    elif arg == 'live_spy=None':
+#      string1  = "       | \`\`%s\`\`: enable live_spy feature?" % (arg)
+#    else:
+#      string1  = "       | \`\`%s\`\` (type1): " % (arg)
+#    yield (string1)
+#    index += 1
+#
+#if not snip.c:
+#  row, col = vim.current.window.cursor
+#  previous_line=snip.buffer[int(row)-2]
+#  m1 = re.search('__init__(\(.+)\)', previous_line)
+#  m2 = re.search('.+?\((.+)\)', previous_line)
+#  if m1 != None and len(m1.groups()) == 1:
+#    args = m1.group(1).split(',')[1:]
+#    args = [arg.strip() for arg in args if arg]
+#    tags = f_args(args)
+#    snip.rv = "short description\n"
+#    snip.rv += "\n"
+#    snip.rv += "    longer description\n"
+#    snip.rv += "\n"
+#    snip.rv += "    **Note**:\n"
+#    snip.rv += "       Do this not that recommendation\n"
+#    snip.rv += "\n"
+#    snip.rv += "    **Args**:\n"
+#    for tag in tags:
+#      snip.rv += tag + "\n"
+#    snip.rv += "\n\n"
+#    snip.rv += "    **Returns**:\n"
+#    snip.rv += "       (type): \n"
+#    snip.rv += "\n"
+#    snip.rv += "    **Example(s)**:\n"
+#    snip.rv += "      \n"
+#    snip.rv += "    .. code-block:: python\n"
+#    snip.rv += "       \n"
+#    snip.rv += "       # example code goes here"
+#    snip.rv += "\n"
+#    snip += ''
+#  elif m2 != None and len(m2.groups()) == 1:
+#    args = m2.group(1).split(',')[0:]
+#    args = [arg.strip() for arg in args if arg]
+#    if args[0] == 'self':
+#      args = args[1:]
+#    tags = f_args(args)
+#    snip.rv = "short description\n"
+#    snip.rv += "\n"
+#    snip.rv += "    longer description\n"
+#    snip.rv += "\n"
+#    snip.rv += "    **Note**:\n"
+#    snip.rv += "       Do this not that recommendation\n"
+#    snip.rv += "\n"
+#    snip.rv += "    **Args**:\n"
+#    for tag in tags:
+#      snip.rv += tag + "\n"
+#    snip.rv += "\n\n"
+#    snip.rv += "    **Returns**:\n"
+#    snip.rv += "       (type): \n"
+#    snip.rv += "\n"
+#    snip.rv += "    **Example(s)**:\n"
+#    snip.rv += "      \n"
+#    snip.rv += "    .. code-block:: python\n"
+#    snip.rv += "       \n"
+#    snip.rv += "       # example code goes here"
+#    snip.rv += "\n"
+#    snip += ''
+#    
+#`'''
+#endsnippet
 
 #def is_class_line(line):
 #  m = re.search('(class)', line)
@@ -717,7 +717,7 @@ ${1:NamedPayload} = \
   namedtuple('$1', ['$2', $0 ])
 endsnippet
 
-snippet comment1 "Google style docstring" b
+snippet comment "rst comment for class, method or function" b
 `!p
 import re
 from functools import partial
@@ -743,7 +743,7 @@ def parse_class(snip):
     row = int(snip.snippet_start[0]) - 1
     line = snip.buffer[row]
     spaces = 4
-    match = re.match(r"^class\s+(\w+)\(([\w\s,]*)\):", line)
+    match = re.match(r"^class\s+(\w+)\s*(?:\((.*?)\))?\s*:", line)
     if match:
         class_name, base_classes_list = match.groups()
         spcs = partial(_spaces, number=4)

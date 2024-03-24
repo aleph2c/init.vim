@@ -99,7 +99,7 @@ call plug#begin('~/.local/share/nvim/plugged')
   Plug 'yanqd0/nginx.vim'
 
   " Refactoring
-  Plug 'python-rope/ropevim'
+  "Plug 'python-rope/ropevim'
 
 call plug#end()
 

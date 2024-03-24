@@ -1,5 +1,5 @@
 ###########################################################################
-#							 TEXTMATE SNIPPETS							  #
+#               TEXTMATE SNIPPETS                #
 ###########################################################################
 #
 #! header
@@ -10,7 +10,7 @@ endsnippet
 
 snippet ifmain "ifmain" b
 if __name__ == '__main__':
-	$0
+  $0
 endsnippet
 
 ##########
@@ -19,17 +19,17 @@ endsnippet
 
 snippet if "if statement"
 if ${1:condition}:
-	${0:# code}
+  ${0:# code}
 endsnippet
 
 snippet else "else block"
 else:
-	${0: #code}
+  ${0: #code}
 endsnippet
 
 snippet elif "else-if block"
 elif ${1:condition}:
-	${0:# code}
+  ${0:# code}
 endsnippet
 
 # The smart def and smart class snippets use a global option called
@@ -38,92 +38,114 @@ endsnippet
 
 global !p
 import os
-NORMAL	= 0x1
+NORMAL  = 0x1
 DOXYGEN = 0x2
-SPHINX	= 0x3
+SPHINX  = 0x3
 
 global_state_name = None
 
+def parse_function_or_method(line):
+    """
+    Parses a line of Python code to extract the function/method name and parameters.
+    Returns a tuple of (name, parameters) or (None, None) if parsing fails.
+    """
+    match = re.match(r'def (\w+)\((.*?)\):', line)
+    if match:
+        return match.group(1), match.group(2)
+    return None, None
+
+def generate_docstring(name, parameters):
+    """
+    Generates a docstring template for a given function/method name and parameters.
+    """
+    params = parameters.split(',')
+    params = [param.strip() for param in params if param.strip()]
+    docstring = f'"""{name}.\n\nArgs:\n'
+    for param in params:
+        docstring += f'    {param}: \n'
+    docstring += '\nReturns:\n    \n"""'
+    return docstring
+
 def remove_extension(filename):
-	return os.path.splitext(filename)[0] 
+  return os.path.splitext(filename)[0] 
 
 def fix_indent(snip):
   snip.unshift(2)
   return snip.mkline(line="")
 
 def get_args(arglist):
-	args = [arg.split('=')[0].strip() for arg in arglist.split(',') if arg]
-	args = [arg for arg in args if arg and arg != "self"]
-	return args
+  args = [arg.split('=')[0].strip() for arg in arglist.split(',') if arg]
+  args = [arg for arg in args if arg and arg != "self"]
+  return args
 
 def get_style(snip):
-	style = snip.opt("g:ultisnips_python_style", "normal")
-	if style == "doxygen":
-		return DOXYGEN
-	elif style == "sphinx":
-		return SPHINX
-	else:
-		return NORMAL
+  style = snip.opt("g:ultisnips_python_style", "normal")
+  if style == "doxygen":
+    return DOXYGEN
+  elif style == "sphinx":
+    return SPHINX
+  else:
+    return NORMAL
 
 def make_handler(state_name, signal):
-	result = ""
-	result = state_name 
-	result += "_"
-	result += signal.lower()
-	return result
+  result = ""
+  result = state_name 
+  result += "_"
+  result += signal.lower()
+  return result
 
 def from_options(t, options):
-	if t:
-		options = [m[len(t):] for m in options if m.startswith(t)]
-	if len(options) == 1:
-		return options[0]
-	else:
-		return "(" + "|".join(options) + ")"
+  if t:
+    options = [m[len(t):] for m in options if m.startswith(t)]
+  if len(options) == 1:
+    return options[0]
+  else:
+    return "(" + "|".join(options) + ")"
 
 def format_arg(arg, style):
-	if style == DOXYGEN:
-		return "@param %s @todo" % arg
-	elif style == SPHINX:
-		return ":param %s: @todo" % arg
-	elif style == NORMAL:
-		return ":%s: @todo" % arg
+  if style == DOXYGEN:
+    return "@param %s @todo" % arg
+  elif style == SPHINX:
+    return ":param %s: @todo" % arg
+  elif style == NORMAL:
+    return ":%s: @todo" % arg
 
 def format_return(style):
-	if style == DOXYGEN:
-		return "@return: @todo"
-	elif style in (NORMAL, SPHINX):
-		return ":returns: @todo"
+  if style == DOXYGEN:
+    return "@return: @todo"
+  elif style in (NORMAL, SPHINX):
+    return ":returns: @todo"
 
 def write_docstring_args(args, snip):
-	if not args:
-		snip.rv += ' """'
-		return
+  if not args:
+    snip.rv += ' """'
+    return
 
-	snip.rv += '\n' + snip.mkline('', indent='')
+  snip.rv += '\n' + snip.mkline('', indent='')
 
-	style = get_style(snip)
+  style = get_style(snip)
 
-	for arg in args:
-		snip += format_arg(arg, style)
+  for arg in args:
+    snip += format_arg(arg, style)
 
 
 def write_init_body(args, parents, snip):
-	parents = [p.strip() for p in parents.split(",")]
-	parents = [p for p in parents if p != 'object']
+  parents = [p.strip() for p in parents.split(",")]
+  parents = [p for p in parents if p != 'object']
 
-	for p in parents:
-		snip += p + ".__init__(self)"
+  for p in parents:
+    snip += p + ".__init__(self)"
 
-	if parents:
-		snip.rv += '\n' + snip.mkline('', indent='')
+  if parents:
+    snip.rv += '\n' + snip.mkline('', indent='')
 
-	for arg in args:
-		snip += "self._%s = %s" % (arg, arg)
+  for arg in args:
+    snip += "self._%s = %s" % (arg, arg)
 
 
 def write_slots_args(args, snip):
-	args = ['"%s"' % arg for arg in args]
-	snip += '__slots__ = (%s,)' % ', '.join(args)
+  args = ['"%s"' % arg for arg in args]
+  snip += '__slots__ = (%s,)' % ', '.join(args)
 
 endglobal
 
@@ -133,10 +155,10 @@ endglobal
 
 snippet class "class with docstrings" b
 class ${1:MyClass}(${2:object}):
-	"""${3:Docstring for $1 }"""
+  """${3:Docstring for $1 }"""
 
-	def __init__(self$4):
-		"""${5:@todo: to be defined}`!p
+  def __init__(self$4):
+    """${5:@todo: to be defined}`!p
 snip.rv = ""
 snip >> 2
 
@@ -144,12 +166,12 @@ args = get_args(t[4])
 
 write_docstring_args(args, snip)
 if args:
-	snip.rv += '\n' + snip.mkline('', indent='')
-	snip += '"""'
+  snip.rv += '\n' + snip.mkline('', indent='')
+  snip += '"""'
 
 write_init_body(args, t[2], snip)
 `
-		$0
+    $0
 endsnippet
 
 snippet method "method with dynamic docblock"
@@ -159,16 +181,16 @@ snippet method "method with dynamic docblock"
 # tabstops to the datatype for these param tags until that feature is added.
 def format_args(arguments):
   index = 1
-	# we add the '|' to make the arg lists appear on seperate lines.
-	# (I'm starting to wonder about rst... it fills the code with clutter and
-	# distracting garbage)
+  # we add the '|' to make the arg lists appear on seperate lines.
+  # (I'm starting to wonder about rst... it fills the code with clutter and
+  # distracting garbage)
   for arg in arguments:
-		if arg == '*args':
-			string1  = "       | \`\`%s\`\`: variable length arguement list" % (arg)
-		elif arg == '**kwargs':
-			string1  = "       | \`\`%s\`\`: arbitrary keyword arguements" % (arg)
-		else:
-			string1  = "       | \`\`%s\`\` (type1): " % (arg)
+    if arg == '*args':
+      string1  = "       | \`\`%s\`\`: variable length arguement list" % (arg)
+    elif arg == '**kwargs':
+      string1  = "       | \`\`%s\`\`: arbitrary keyword arguements" % (arg)
+    else:
+      string1  = "       | \`\`%s\`\` (type1): " % (arg)
     yield (string1)
     index += 1
 
@@ -178,30 +200,30 @@ arguments = [argument.strip() for argument in arguments if argument]
 if len(arguments):
   fargs = format_args(arguments)
   tags = [next(fargs) for index in range(len(arguments))] 
-	snip.rv = "    '''short description\n"
-	snip.rv += "\n"
-	snip.rv += "    longer description\n"
-	snip.rv += "\n"
-	snip.rv += "    **Note**:\n"
-	snip.rv += "       Do this not that recommendation\n"
-	snip.rv += "\n"
-	snip.rv += "    **Args**:"
-	for tag in tags:
-		snip += tag
-	snip.rv += "\n\n"
-	snip.rv += "    **Returns**:\n"
-	snip.rv += "       (type): \n"
-	snip.rv += "\n"
-	snip.rv += "    **Example(s)**:\n"
-	snip.rv += "      \n"
+  snip.rv = "    '''short description\n"
+  snip.rv += "\n"
+  snip.rv += "    longer description\n"
+  snip.rv += "\n"
+  snip.rv += "    **Note**:\n"
+  snip.rv += "       Do this not that recommendation\n"
+  snip.rv += "\n"
+  snip.rv += "    **Args**:"
+  for tag in tags:
+    snip += tag
+  snip.rv += "\n\n"
+  snip.rv += "    **Returns**:\n"
+  snip.rv += "       (type): \n"
+  snip.rv += "\n"
+  snip.rv += "    **Example(s)**:\n"
+  snip.rv += "      \n"
   snip.rv += "    .. code-block:: python\n"
   snip.rv += "       \n"
   snip.rv += "       "
-	snip.rv += "\n"
-	snip += "    '''"
-	snip += ''
+  snip.rv += "\n"
+  snip += "    '''"
+  snip += ''
 else:
-	snip.rv = ''
+  snip.rv = ''
 `    ${0:${VISUAL}}
 endsnippet
 
@@ -209,7 +231,7 @@ snippet handler "write and empty handler"
 @staticmethod
 def $1(cc, e):
   status = return_status.HANDLED
-	return status
+  return status
 $0
 endsnippet
 
@@ -237,15 +259,15 @@ endsnippet
 
 snippet slotclass "class with slots and docstrings" b
 class ${1:MyClass}(${2:object}):
-	"""${3:Docstring for $1 }"""
+  """${3:Docstring for $1 }"""
 `!p
 snip >> 1
 args = get_args(t[4])
 write_slots_args(args, snip)
 `
 
-	def __init__(self$4):
-		"""${5:@todo: to be defined}`!p
+  def __init__(self$4):
+    """${5:@todo: to be defined}`!p
 snip.rv = ""
 snip >> 2
 
@@ -253,12 +275,12 @@ args = get_args(t[4])
 
 write_docstring_args(args, snip)
 if args:
-	snip.rv += '\n' + snip.mkline('', indent='')
-	snip += '"""'
+  snip.rv += '\n' + snip.mkline('', indent='')
+  snip += '"""'
 
 write_init_body(args, t[2], snip)
 `
-		$0
+    $0
 endsnippet
 
 snippet doctest "method to put in main for doctest" b
@@ -268,82 +290,82 @@ endsnippet
 
 snippet contain "methods for emulating a container type" b
 def __len__(self):
-	${1:pass}
+  ${1:pass}
 
 def __getitem__(self, key):
-	${2:pass}
+  ${2:pass}
 
 def __setitem__(self, key, value):
-	${3:pass}
+  ${3:pass}
 
 def __delitem__(self, key):
-	${4:pass}
+  ${4:pass}
 
 def __iter__(self):
-	${5:pass}
+  ${5:pass}
 
 def __reversed__(self):
-	${6:pass}
+  ${6:pass}
 
 def __contains__(self, item):
-	${7:pass}
+  ${7:pass}
 endsnippet
 
 
 snippet context "context manager methods" b
 def __enter__(self):
-	${1:pass}
+  ${1:pass}
 
 def __exit__(self, exc_type, exc_value, traceback):
-	${2:pass}
+  ${2:pass}
 endsnippet
 
 
 snippet attr "methods for customizing attribute access" b
 def __getattr__(self, name):
-	${1:pass}
+  ${1:pass}
 
 def __setattr__(self, name, value):
-	${2:pass}
+  ${2:pass}
 
 def __delattr__(self, name):
-	${3:pass}
+  ${3:pass}
 endsnippet
 
 
 snippet desc "methods implementing descriptors" b
 def __get__(self, instance, owner):
-	${1:pass}
+  ${1:pass}
 
 def __set__(self, instance, value):
-	${2:pass}
+  ${2:pass}
 
 def __delete__(self, instance):
-	${3:pass}
+  ${3:pass}
 endsnippet
 
 
 snippet cmp "methods implementing rich comparison"
 def __eq__(self, other):
-	${1:pass}
+  ${1:pass}
 
 def __ne__(self, other):
-	${2:pass}
+  ${2:pass}
 
 def __lt__(self, other):
-	${3:pass}
+  ${3:pass}
 
 def __le__(self, other):
-	${4:pass}
+  ${4:pass}
 
 def __gt__(self, other):
-	${5:pass}
+  ${5:pass}
 
 def __ge__(self, other):
-	${6:pass}
+  ${6:pass}
 
 def __cmp__(self, other):
-	${7:pass}
+  ${7:pass}
 endsnippet
 
 
@@ -358,7 +380,7 @@ endsnippet
 snippet pp "pretty print routine" b
 import pprint
 def pp(item):
-	pprint.pprint(item)
+  pprint.pprint(item)
 endsnippet
 
 snippet "(E|e)vent" "create an Event" r
@@ -380,27 +402,27 @@ def ${1:state_function_name}(${2:chart}, e):
   if(e.signal == signals.ENTRY_SIGNAL):
     status = return_status.HANDLED
   elif(e.signal == signals.INIT_SIGNAL):
-	  status = return_status.HANDLED
+    status = return_status.HANDLED
   else:
     chart.temp.fun = ${2:parent_state}
     status = return_status.SUPER
-	return status
+  return status
 
 endsnippet
 
 snippet call "create a callback method" b
 @staticmethod
 def ${1:state_function_name}(${2:chart}, e):
-	status = return_status.HANDLED
-	$3
-	return status
+  status = return_status.HANDLED
+  $3
+  return status
 $0
 endsnippet
 
 snippet state "create a state" b
 self.${1:state_name} = self.create(state="$1"). \
   catch(signal=signals.${2:signal},
-	  handler=self.`!p snip.rv=make_handler(t[1], t[2])`). \
+    handler=self.`!p snip.rv=make_handler(t[1], t[2])`). \
   $3`!p snip.rv=from_options(t[3], ['catch', 'to_method()'])`$0
 endsnippet
 
@@ -464,7 +486,7 @@ class SysLogInstrumentedFactory(Factory, ThreadSafeAttributes):
     syslog.syslog("S: [{}] {}".format(self.name, spy))
 
   def logging(self, message):
-		'''provide logging to the syslog'''
+    '''provide logging to the syslog'''
     syslog.syslog("[{}]".format(self.name, message))
 
 $0
@@ -479,10 +501,10 @@ class InstrumentedFactory(Factory):
     self.log_file = '`!p snip.rv=remove_extension(fn)`.log' if log_file == None else log_file
 
     with open(self.log_file, "w") as fp:
-		  fp.write("")
+      fp.write("")
 
     logging.basicConfig(
-		  format='%(asctime)s %(levelname)s:%(message)s',
+      format='%(asctime)s %(levelname)s:%(message)s',
       filename=self.log_file,
       level=logging.DEBUG)
 
@@ -505,40 +527,40 @@ snippet factory "miros factory or ifactory class" b
 class ${1:StateChartName}($2`!p snip.rv=from_options(t[2], ['InstrumentedFactory', 'SysLogInstrumentedFactory', 'Factory'])`):
   def __init__(self, name, live_trace=None, live_spy=None):
     '''comment'''$0
-		`!p 
+    `!p 
 def is_ifactory():
   previous_line=snip.buffer.cursor[0]-1
   while(re.search('class', snip.buffer[previous_line]) == False):
     previous_line -= 1
-	if(re.search('InstrumentedFactory', snip.buffer[previous_line]) or
-	   re.search('InstrumentedFactory', snip.buffer[previous_line-1]) or
-	   re.search('InstrumentedFactory', snip.buffer[previous_line-2]) or
-	   re.search('InstrumentedFactory', snip.buffer[previous_line-3])):
-		return  True
-	else:
-		return False
+  if(re.search('InstrumentedFactory', snip.buffer[previous_line]) or
+     re.search('InstrumentedFactory', snip.buffer[previous_line-1]) or
+     re.search('InstrumentedFactory', snip.buffer[previous_line-2]) or
+     re.search('InstrumentedFactory', snip.buffer[previous_line-3])):
+    return  True
+  else:
+    return False
 snip.rv='super().__init__(name, live_trace=live_trace, live_spy=live_spy)' if is_ifactory() else \
-	'super().__init__(name, live_trace, live_spy)'`
+  'super().__init__(name, live_trace, live_spy)'`
 endsnippet
 
-snippet '''comment''' "factory or ifactory comment" 
+snippet '''comment''' "factory or ifactory comment"
 '''$0`!p
 def f_args(arguments):
   index = 1
-	# we add the '|' to make the arg lists appear on seperate lines.
-	# (I'm starting to wonder about rst... it fills the code with clutter and
-	# distracting garbage)
+  # we add the '|' to make the arg lists appear on seperate lines.
+  # (I'm starting to wonder about rst... it fills the code with clutter and
+  # distracting garbage)
   for arg in arguments:
-		if arg == '*args':
-			string1  = "       | \`\`%s\`\`: variable length arguement list" % (arg)
-		elif arg == '**kwargs':
-			string1  = "       | \`\`%s\`\`: arbitrary keyword arguments" % (arg)
-		elif arg == 'live_trace=None':
-			string1  = "       | \`\`%s\`\`: enable live_trace feature?" % (arg)
-		elif arg == 'live_spy=None':
-			string1  = "       | \`\`%s\`\`: enable live_spy feature?" % (arg)
-		else:
-			string1  = "       | \`\`%s\`\` (type1): " % (arg)
+    if arg == '*args':
+      string1  = "       | \`\`%s\`\`: variable length arguement list" % (arg)
+    elif arg == '**kwargs':
+      string1  = "       | \`\`%s\`\`: arbitrary keyword arguements" % (arg)
+    elif arg == 'live_trace=None':
+      string2  = "       | \`\`%s\`\`: enable live_trace feature?" % (arg)
+    elif arg == 'live_spy=None':
+      string1  = "       | \`\`%s\`\`: enable live_spy feature?" % (arg)
+    else:
+      string1  = "       | \`\`%s\`\` (type1): " % (arg)
     yield (string1)
     index += 1
 
@@ -549,7 +571,7 @@ if not snip.c:
   m2 = re.search('.+?\((.+)\)', previous_line)
   if m1 != None and len(m1.groups()) == 1:
     args = m1.group(1).split(',')[1:]
-		args = [arg.strip() for arg in args if arg]
+    args = [arg.strip() for arg in args if arg]
     tags = f_args(args)
     snip.rv = "short description\n"
     snip.rv += "\n"
@@ -572,11 +594,11 @@ if not snip.c:
     snip.rv += "       # example code goes here"
     snip.rv += "\n"
     snip += ''
-	elif m2 != None and len(m2.groups()) == 1:
+  elif m2 != None and len(m2.groups()) == 1:
     args = m2.group(1).split(',')[0:]
-		args = [arg.strip() for arg in args if arg]
-		if args[0] == 'self':
-			args = args[1:]
+    args = [arg.strip() for arg in args if arg]
+    if args[0] == 'self':
+      args = args[1:]
     tags = f_args(args)
     snip.rv = "short description\n"
     snip.rv += "\n"
@@ -599,7 +621,7 @@ if not snip.c:
     snip.rv += "       # example code goes here"
     snip.rv += "\n"
     snip += ''
-		
+    
 `'''
 endsnippet
 
@@ -647,16 +669,16 @@ snippet catch "create a catch" b
 catch(signal=signals.${1:signal_name},
   handler=self.`!p 
 def is_state_line(state_line):
-	m = re.search('state="(.+)"', state_line)
-	try:
-		m.group(1)
-		result = True
-	except:
-		result = False
-	return result
+  m = re.search('state="(.+)"', state_line)
+  try:
+    m.group(1)
+    result = True
+  except:
+    result = False
+  return result
 previous_line=snip.buffer.cursor[0]-1
 while(is_state_line(snip.buffer[previous_line]) == False):
-	previous_line -= 1
+  previous_line -= 1
 m = re.search('state="(.+)"', snip.buffer[previous_line])
 state_name = m.group(1)
 snip.rv=make_handler(state_name, t[1])`). \
@@ -685,9 +707,9 @@ endsnippet
 snippet oneshot "create a oneshot" 
 ${1:chart}.post_fifo(
   Event(signal=signals.${2:signal_name}),
-	times=1,
-	period=${3:period_in_seconds},
-	deferred=True)$0
+  times=1,
+  period=${3:period_in_seconds},
+  deferred=True)$0
 endsnippet
 
 snippet payload "created namedtuple payload" b
@@ -819,6 +841,5 @@ else:
     parse_function_def(snip)
 `
 endsnippet
-
 
 # vim:ft=snippets:

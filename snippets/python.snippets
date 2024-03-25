@@ -6,6 +6,7 @@
 global !p
 import os
 import re
+from pathlib import Path
 from functools import partial
 
 NORMAL  = 0x1
@@ -30,6 +31,29 @@ def _line(value, spaces=None):
     else:
        string = value
     return string
+
+def parse_module(snip):
+    filename = os.path.basename(vim.current.buffer.name)
+    module_name = Path(filename).stem
+    escaped_module_name = module_name.replace('_', '\_')
+    snip.rv = f'''"""
+
+**{module_name}:**
+    short description
+
+Longer description
+
+**Notes**:
+    notes goes here
+
+**Example(s)**:
+
+.. code-block:: python
+
+    import {module_name}
+    # example code goes here
+
+"""'''
 
 def parse_class(snip):
     row = int(snip.snippet_start[0]) - 1
@@ -128,33 +152,13 @@ def parse_function_def(snip):
 
 def parse_comment(snip):
     row = int(snip.snippet_start[0]) - 1
-    if "class" in snip.buffer[row]:
+
+    if row < 0:
+        parse_module(snip)
+    elif "class" in snip.buffer[row]:
         parse_class(snip)
     else:
         parse_function_def(snip)
-
-
-def parse_function_or_method(line):
-    """
-    Parses a line of Python code to extract the function/method name and parameters.
-    Returns a tuple of (name, parameters) or (None, None) if parsing fails.
-    """
-    match = re.match(r'def (\w+)\((.*?)\):', line)
-    if match:
-        return match.group(1), match.group(2)
-    return None, None
-
-def generate_docstring(name, parameters):
-    """
-    Generates a docstring template for a given function/method name and parameters.
-    """
-    params = parameters.split(',')
-    params = [param.strip() for param in params if param.strip()]
-    docstring = f'"""{name}.\n\nArgs:\n'
-    for param in params:
-        docstring += f'    {param}: \n'
-    docstring += '\nReturns:\n    \n"""'
-    return docstring
 
 def remove_extension(filename):
   return os.path.splitext(filename)[0] 

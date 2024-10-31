@@ -15,4 +15,15 @@ let g:vimwiki_list          = [
   \ 'ext': '.md' ,
   \ 'path': '~/projects/confidante/time_tracking/diary'},
   \ ]
-let g:vimwiki_use_calendar=0
+let g:vimwiki_use_calendar = 0
+let g:vimwiki_auto_header = 0
+let g:vimwiki_listsyms = ' X'
+let g:vimwiki_list_ignore_newline = 1
+
+" Custom key mappings to handle list numbering manually
+augroup VimwikiCustomMappings
+  autocmd!
+  autocmd FileType vimwiki nnoremap <buffer> o o<Esc>^Da
+  autocmd FileType vimwiki nnoremap <buffer> O O<Esc>^Da
+augroup END
+

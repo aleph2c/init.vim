@@ -309,3 +309,11 @@ snippet date "Insert current date" b
 #snippet date "Insert current date" iA
 \`\``!v strftime("%Y-%m-%d")`\`\`
 endsnippet
+
+snippet uuid "Insert UUID" 
+`!p if not snip.c: snip.rv = str(__import__('uuid').uuid4())`
+endsnippet
+
+snippet uuidh "Insert UUID as hex" 
+`!p if not snip.c: snip.rv = __import__('uuid').uuid4().hex`
+endsnippet

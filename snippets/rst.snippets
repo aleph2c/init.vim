@@ -342,9 +342,9 @@ snippet uuidh "Insert UUID as hex"
 `!p if not snip.c: snip.rv = _uuidh()`
 endsnippet
 
-snippet meta "meta for protocol compendium"
+snippet meta "meta non-instruction of the protocol compendium"
 :protocols: P00X.Y
-:uuid:`!p if not snip.c: snip.rv=_uuid()`
+:uuid: `!p if not snip.c: snip.rv=_uuid()`
 :instruction: $1`!p snip.rv=from_options(t[1], [
 'instruction', 'technique', 'trick', 'article', 'story', 'pitfall', 'question', 'aphorism'
 ])`
@@ -352,7 +352,8 @@ snippet meta "meta for protocol compendium"
 :ai-roles: ai-roles
 :difficulty: difficulty
 :prerequisites:
-:tags: 
+:related-to: 
+:tags: tag
 endsnippet
 
 snippet protocol "protocol for the protocol compendium"
@@ -538,7 +539,8 @@ endsnippet
 
 snippet tag "tag type for the protocol compendium"
 $1`!p snip.rv=from_options(t[1], [
-'fundamental',
+'fundamentals',
+'metacognition',
 'innovation',
 'communications',
 'negotiation',

@@ -18,7 +18,17 @@
 
 global !p
 import re
+import vim
+import uuid
 import datetime
+
+def debug(thing):
+    # to debug: debug(<var>)
+    # then
+    # tail -f /tmp/ultisnips_debug.log
+    with open("/tmp/ultisnips_debug.log", "a") as f:
+        f.write("Debug infor: {}\n".format(thing))
+
 def hypertarget(filename, t):
   return '..' ' _' + filename + '__' + re.sub(r'([ ?]{1,})', '_', t).lower() + ':'
 
@@ -30,14 +40,87 @@ def current_date():
 	return now.strftime("%Y-%m-%d")
 
 def from_options(t, options):
-	if t:
-		options = [m[len(t):] for m in options if m.startswith(t)]
-	if len(options) == 1:
-		return options[0]
-	else:
-		return "(" + "|".join(options) + ")"
-endglobal
+  if t:
+    options = [m[len(t):] for m in options if m.startswith(t)]
+  if len(options) == 1:
+    return options[0]
+  else:
+    return "(" + "|".join(options) + ")"
 
+def from_dict_options(t, options_dict):
+    if not t:
+        # When no text is typed, show all keys as possible completions
+        return "(" + "|".join(options_dict.keys()) + ")"
+
+    if t in options_dict:
+        replacement = options_dict[t]
+        if replacement.startswith(t):
+            # Partial replacement: return the remaining part to append
+            return replacement[len(t):]
+        else:
+            return t
+
+    # Handle partial matches for autocompletion
+    matching_keys = [k for k in options_dict.keys() if k.startswith(t)]
+    if matching_keys:
+        # Extract the remaining parts of matching keys
+        remaining = [k[len(t):] for k in matching_keys]
+        # Join them with "|" for UltiSnips to display as completion options
+        return "(" + "|".join(r for r in remaining if r) + ")"
+
+    # If no matches found, return an empty string
+    return ""
+
+def dict_expand(spec):
+    options_dict = spec
+
+    result = from_dict_options(t[1], options_dict)
+    snip.rv = result
+    if result in options_dict:
+        current_word = vim.eval("expand('<cword>')")
+        #with open('/tmp/ultisnips_debug.txt', 'a') as f:
+        #    f.write(f"current_word: {current_word}\n")
+        snip.rv = ':' + options_dict[result]
+
+
+def post_process(abbr, replacement):
+    # Get the current buffer and cursor position
+    buffer = vim.current.buffer
+    cursor_row, cursor_col = vim.current.window.cursor
+
+    # Get the current line
+    current_line = buffer[cursor_row - 1]
+
+    # Split the line into words
+    words = current_line.split()
+
+    if not words:
+        return  # Nothing to process
+
+    # Check if the last word is the abbreviation
+    if words[-1] == abbr:
+        if replacement:
+            # Replace the abbreviation with the replacement
+            words[-1] = replacement
+            new_line = ' '.join(words)
+            buffer[cursor_row - 1] = new_line
+
+            # Move the cursor to the end of the replacement
+            vim.current.window.cursor = (cursor_row, len(new_line))
+    else:
+        # The abbreviation is not at the end; no action needed
+        pass
+
+
+def _uuid():
+    return str(uuid.uuid4())
+
+def _uuidh():
+    return uuid.uuid4().hex
+
+
+
+endglobal
 
 
 snippet abr "abbreviation" 
@@ -206,9 +289,6 @@ snippet link "create a link"
 \`$1 <$2>\`_
 endsnippet
 
-# 
-#    :class: $3`!p snip.rv=from_options(t[3], ['scale-to-fit', 'noscale-center', 'noscale-left', 'noscale-left-wrap', 'noscale-right-wrap'])`
-    
 snippet image "Add an image" b
 .. figure:: /_static/$1.svg
     :target: /_static/$1.pdf
@@ -250,70 +330,223 @@ snippet comment "Comment" b
   $0
 endsnippet
 
-# boiler plate for question 1
-snippet question1 "write question html infrastructure" b
-${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(1))[4:-1]`>`}
-${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(1))`}
-**${1:${VISUAL:type your question here}}?**
-.. include:: i_navigation_1.rst
-$0
-endsnippet
-
-# boiler plate for question 2
-snippet question2 "write question html infrastructure" b
-${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(2))[4:-1]`>`}
-${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(2))`}
-**${1:${VISUAL:type your question here}}?**
-.. include:: i_navigation_2.rst
-$0
-endsnippet
-
-# boiler plate for question 3
-snippet question3 "write question html infrastructure" b
-${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(3))[4:-1]`>`}
-${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(3))`}
-**${1:${VISUAL:type your question here}}?**
-.. include:: i_navigation_3.rst
-$0
-endsnippet
-
-# boiler plate for question 4
-snippet question4 "write question html infrastructure" b
-${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(4))[4:-1]`>`}
-${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(4))`}
-**${1:${VISUAL:type your question here}}?**
-.. include:: i_navigation_4.rst
-$0
-endsnippet
-
-# boiler plate for question 5
-snippet question5 "write question html infrastructure" b
-${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(5))[4:-1]`>`}
-${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(5))`}
-**${1:${VISUAL:type your question here}}?**
-.. include:: i_navigation_5.rst
-$0
-endsnippet
-
-
-# boiler plate for question 6
-snippet question6 "write question html infrastructure" b
-${3:* :ref:\``!p snip.rv = t[1] + '? <' + hypertarget(snip.basename, t[1] + str(6))[4:-1]`>`}
-${2:`!p snip.rv = hypertarget(snip.basename, t[1] + str(6))`}
-**${1:${VISUAL:type your question here}}?**
-.. include:: i_navigation_6.rst
-$0
-endsnippet
-
 snippet date "Insert current date" b
-#snippet date "Insert current date" iA
 \`\``!v strftime("%Y-%m-%d")`\`\`
 endsnippet
 
 snippet uuid "Insert UUID" 
-`!p if not snip.c: snip.rv = str(__import__('uuid').uuid4())`
+`!p if not snip.c: snip.rv = _uuid()`
 endsnippet
 
 snippet uuidh "Insert UUID as hex" 
-`!p if not snip.c: snip.rv = __import__('uuid').uuid4().hex`
+`!p if not snip.c: snip.rv = _uuidh()`
+endsnippet
+
+snippet meta "meta for protocol compendium"
+:protocols: P00X.Y
+:uuid:`!p if not snip.c: snip.rv=_uuid()`
+:instruction: $1`!p snip.rv=from_options(t[1], [
+'instruction', 'technique', 'trick', 'article', 'story', 'pitfall', 'question', 'aphorism'
+])`
+:roles: roles$0
+:ai-roles: ai-roles
+:difficulty: difficulty
+:prerequisites:
+:tags: 
+endsnippet
+
+snippet protocol "protocol for the protocol compendium"
+$1`!p snip.rv=from_options(t[1], ['P001', 'P002'])`
+endsnippet
+
+snippet instruction "instruction type for the protocol compendium"
+$1`!p dict_expand({
+    'in': 'instructions',
+    'tech': 'technique',
+    'tr': 'trick',
+    'art': 'article',
+    'st': 'story',
+    'pit': 'pitfall',
+    'lnk': 'links',
+    'ap': 'aphorism',
+    'qu': 'question',
+})
+`
+endsnippet
+
+snippet lnk:links
+links
+endsnippet
+
+snippet :instruction: "instruction meta data"
+:protocols: P00X.Y
+:instruction: instruction$0
+:uuid: `!p if not snip.c: snip.rv = _uuid()`
+:roles: roles
+:name: 
+:ai-role: ai-roles
+:difficulty: difficulty
+:related-to: 
+:tags: tag
+endsnippet
+
+
+snippet role "role for the protocol compendium"
+$1`!p dict_expand({
+    'see':'seeker', 
+    'gui':'guide', 
+    'can':'candidate', 
+    'onb':'onboarder',
+    'men':'mentor'
+})
+`
+endsnippet
+
+snippet roles "role for the protocol compendium"
+$1`!p dict_expand({
+    'see':'+seeker', 
+    'gui':'+guide', 
+    'can':'+candidate', 
+    'onb':'+onboarder',
+    'men':'+mentor'
+})
+`
+endsnippet
+
+snippet see:+seeker
+seeker, roles
+endsnippet
+
+snippet gui:+guide
+guide, roles
+endsnippet
+
+snippet can:+candidate
+candidate, roles
+endsnippet
+
+snippet onb:+onboarder
+onboarder, roles
+endsnippet
+
+snippet men:+mentor
+mentor, roles
+endsnippet
+
+snippet difficulty "competency requirement for the protocol compendium"
+$1`!p dict_expand({
+    'beg':'beginner', 
+    'dev':'developing', 
+    'com':'competent', 
+    'prof':'proficient',
+    'ex':'expert'
+})
+`
+endsnippet
+
+snippet ai-role "ai-role for the protocol compendium"
+$1`!p dict_expand({
+    'so': 'strategic-oversight',
+    'kb': 'knowledge-builder',
+    'mm': 'map-maker',
+    'ep': 'event-planner',
+    'pc': 'performance-coach',
+    'fb': 'focus-booster',
+    'fix': 'fixer',
+    'dip': 'diplomat',
+    'spy': 'spy'
+})
+`
+endsnippet
+
+snippet so:strategic-oversight
+strategic-oversight
+endsnippet
+
+snippet kb:knowledge-builder
+knowledge-builder
+endsnippet
+
+snippet mm:map-maker
+map-maker
+endsnippet
+
+snippet ep:event-planner
+event-planner
+endsnippet
+
+snippet pc:performance-coach
+performance-coach
+endsnippet
+
+snippet fb:focus-booster
+focus-booster
+endsnippet
+
+
+snippet ai-roles "ai-role for the protocol compendium"
+$1`!p dict_expand({
+    'so': '+strategic-oversight',
+    'kb': '+knowledge-builder',
+    'mm': '+map-maker',
+    'ep': '+event-planner',
+    'pc': '+performance-coach',
+    'fb': '+focus-booster',
+    'fix': '+fixer',
+    'dip': '+diplomat',
+    'spy': '+spy'
+})
+`
+endsnippet
+
+snippet so:+strategic-oversight
+strategic-oversight, ai-roles
+endsnippet
+
+snippet kb:+knowledge-builder
+knowledge-builder, ai-roles
+endsnippet
+
+snippet mm:+map-maker
+map-maker, ai-roles
+endsnippet
+
+snippet ep:+event-planner
+event-planner, ai-roles
+endsnippet
+
+snippet pc:+performance-coach
+performance-coach, ai-roles
+endsnippet
+
+snippet fb:+focus-booster
+focus-booster, ai-roles
+endsnippet
+
+snippet fix:+fixer
+fixer, ai-roles
+endsnippet
+
+snippet dip:+diplomat
+diplomat, ai-roles
+endsnippet
+
+snippet spy:+spy
+spy, ai-roles
+endsnippet
+
+
+snippet tag "tag type for the protocol compendium"
+$1`!p snip.rv=from_options(t[1], [
+'fundamental',
+'innovation',
+'communications',
+'negotiation',
+'learning',
+'competition',
+'troubleshooting',
+'design',
+'management',
+'bureaucracies',
+])`
 endsnippet

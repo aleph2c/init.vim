@@ -346,7 +346,8 @@ snippet meta "meta non-instruction of the protocol compendium"
 :protocols: P00X.Y
 :uuid: `!p if not snip.c: snip.rv=_uuid()`
 :instruction: $1`!p snip.rv=from_options(t[1], [
-'instruction', 'technique', 'trick', 'article', 'story', 'pitfall', 'question', 'aphorism'
+'instruction', 'technique', 'trick', 'article', 'story', 'pitfall', 'question',
+'link', 'aphorism'
 ])`
 :roles: roles$0
 :ai-roles: ai-roles
@@ -460,6 +461,10 @@ $1`!p dict_expand({
 `
 endsnippet
 
+snippet ai-all "all ai-roles"
+strategic-oversight, knowledge-builder, map-maker, event-planner, performance-coach, focus-booster, fixer, diplomat, spy
+endsnippet
+
 snippet so:strategic-oversight
 strategic-oversight
 endsnippet
@@ -536,11 +541,11 @@ snippet spy:+spy
 spy, ai-roles
 endsnippet
 
-
 snippet tag "tag type for the protocol compendium"
 $1`!p snip.rv=from_options(t[1], [
 'fundamentals',
 'metacognition',
+'deception',
 'innovation',
 'communications',
 'negotiation',
@@ -548,7 +553,13 @@ $1`!p snip.rv=from_options(t[1], [
 'competition',
 'troubleshooting',
 'design',
+'leadership',
 'management',
 'bureaucracies',
 ])`
 endsnippet
+
+snippet tag-all "tag type for the protocol compendium"
+fundamentals, metacognition, deception, innovation, communications, negotiation, learning, competition, troubleshooting, design, management, bureaucracies
+endsnippet
+

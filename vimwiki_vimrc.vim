@@ -27,3 +27,4 @@ augroup VimwikiCustomMappings
   autocmd FileType vimwiki nnoremap <buffer> O O<Esc>^Da
 augroup END
 
+

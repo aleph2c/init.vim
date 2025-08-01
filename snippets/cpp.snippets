@@ -26,3 +26,33 @@ snippet package "h-package" b
 
 ==============================================================================*/
 endsnippet
+
+# Include guard based on filename
+# Trigger: guard
+snippet guard "Include guard for header file" b
+#ifndef ${1:`!p
+import re
+import os # Import the os module
+
+# Get the full path of the current buffer using snip.fn
+# snip.fn is often the simplest way to get the current filename in Ultisnips
+full_path = snip.fn
+# Extract just the filename from the path
+filename = os.path.basename(full_path)
+
+# Convert to uppercase, replace non-alphanumeric (except underscore) with underscore
+# and ensure it starts with a letter or underscore (common C macro rule)
+define_name = re.sub(r'[^a-zA-Z0-9_]', '_', filename).upper()
+# Ensure it doesn't start with a digit (macros can't start with digits)
+if re.match(r'^[0-9]', define_name):
+    define_name = '_' + define_name
+# Add a common suffix like _H or _H_
+# define_name += '_H_'
+snip.rv = define_name
+`}
+#define $1
+
+$0
+
+#endif /* $1 */
+endsnippet

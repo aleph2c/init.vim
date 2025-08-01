@@ -1,5 +1,5 @@
 " let g:python3_host_prog =substitute(system('which python3'), '\n', '', '')
-"let g:python3_host_prog = '/usr/bin/python3'
+let g:python3_host_prog = '/usr/bin/python3'
 let g:python3_host_prog =substitute(system('which python3'), '\n', '', '')
 
 let g:session_autoload = 'no'
@@ -8,9 +8,20 @@ let mapleader=","
 
 call plug#begin('~/.local/share/nvim/plugged')
 
+  " These plugins will destroy hours of your time
+  "Plug 'ycm-core/YouCompleteMe'
+  Plug 'w0rp/ale'
+
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
+
   " XML
   Plug 'othree/xml.vim'
   Plug 'christoomey/vim-tmux-navigator'
+
+  " Matching
+  Plug 'andymass/vim-matchup'
+  Plug 'nvim-treesitter/nvim-treesitter'
 
   "Look of vim o
   Plug 'Lokaltog/vim-powerline'
@@ -36,7 +47,7 @@ call plug#begin('~/.local/share/nvim/plugged')
 
   " vividchalk doesn't work for searching
   Plug 'altercation/vim-colors-solarized'
-
+  Plug 'folke/tokyonight.nvim'
   " Directory Changing
   Plug 'airblade/vim-rooter'
 
@@ -82,8 +93,6 @@ call plug#begin('~/.local/share/nvim/plugged')
   " Destroy all buffers not currently open
   Plug 'artnez/vim-wipeout'
 
-  " Linting
-  Plug 'w0rp/ale'
 
   " Testing
   Plug 'janko-m/vim-test'
@@ -103,6 +112,23 @@ call plug#begin('~/.local/share/nvim/plugged')
   "Plug 'python-rope/ropevim'
 
 call plug#end()
+set termguicolors
+autocmd BufRead,BufNewFile *.h setfiletype c
+
+
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  matchup = {
+    enable = true,              -- mandatory, false will disable the whole extension
+    disable = { "c", "ruby" },  -- optional, list of language that will be disabled
+    -- Add other matchup options here if needed
+  },
+  -- You might have other treesitter modules configured here as well, e.g.:
+  -- highlight = { enable = true },
+  -- indent = { enable = true },
+}
+EOF
+
 
 packadd! matchit
 
@@ -128,6 +154,14 @@ source $VIMRCHOME\youcompleteme_vimrc.vim
 source $VIMRCHOME\trace.vim
 source $VIMRCHOME\ripgrep_vimrc.vim
 source $VIMRCHOME\vimlsp_vimrc.vim
+
+
+" --- SAPF AUDIO PLAYER ---
+lua require('sapf_player')
+nnoremap <Leader><Leader>e <Cmd>lua require('sapf_player').play()<CR>
+vnoremap <Leader><Leader>e <Cmd>lua require('sapf_player').play()<CR>
+nnoremap <Leader><Leader>s <Cmd>lua require('sapf_player').stop()<CR>
+"echom "Sapf player loaded: <Leader><Leader>e (play), <Leader><Leader>s (stop)"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                             Resizing the Window                              "
@@ -159,16 +193,21 @@ nmap <silent> <leader><C-j> <Plug>(ale_next_wrap)
 nmap <silent> <leader><C-k> <Plug>(ale_previous_wrap)
 let g:ale_sign_column_always=1
 let g:ale_python_flake8_executable='flake8'
-" PEP8 go to hell!  
-" Lint (ale_python_flake8) is an EXTREMELY useful tool, but it has been filled with false alarms by PEP8
+" PEP8 GO TO HELL!
+" Lint (ale_python_flake8) is an EXTREMELY useful tool,
+"
+" PEP8 breaks developer-FLOW, as you write your ale_python_flake8 tool fills
+" your buffer with distracting false warnings and errors.  This effectively
+" breaks the utility of the tool.  REMOVE THE garbage that has been added by the
+" OCD PEP8 tyrants - there will always ruiners.
+"
 " Here are my PEP8 noise-over-rides
 let g:ale_python_flake8_options =  "--ignore=W0311,"
-let g:ale_python_flake8_options .= 'E501,' "line too long for the 70s
-let g:ale_python_flake8_options .= 'E114,' "indent must be 4, no thank you
-let g:ale_python_flake8_options .= 'E111,' "indentation is not a multiple of four, didn't we cover this?
+"let g:ale_python_flake8_options .= 'F401,' "bike-shedding imports
+let g:ale_python_flake8_options .= 'E501,' "line too long for the 1970s
+let g:ale_python_flake8_options .= 'E261,' "inline comment noise
 let g:ale_python_flake8_options .= 'E272,' "multiple spaces before keyword, breaks tabularize
 let g:ale_python_flake8_options .= 'E221,' "multiple spaces before operator, breaks tabularize
-let g:ale_python_flake8_options .= 'E251,' "continuation line with same indent as next logical line
 let g:ale_python_flake8_options .= 'E241,' "multiple space after ',' breaks tabularize
 let g:ale_python_flake8_options .= 'E121,' "weird OCD overhang noise (wasting my precious heartbeats)
 let g:ale_python_flake8_options .= 'E222,' "multiple spaces after operator, breaks tabularize
@@ -183,10 +222,31 @@ let g:ale_python_flake8_options .= 'E302,' "strange OCD space issue
 let g:ale_python_flake8_options .= 'E303,' "strange OCD space issue
 let g:ale_python_flake8_options .= 'E305,' "strange OCD space issue
 let g:ale_python_flake8_options .= 'E265,' "hashtag comment space noise (distracting while debugging)
+let g:ale_python_flake8_options .= 'E114,' "indent must be 4, no thank you
+let g:ale_python_flake8_options .= 'E111,' "indentation is not a multiple of four, didn't we cover this?
+let g:ale_python_flake8_options .= 'E251,' "continuation line with same indent as next logical line
 let g:session_autoload        = 'no'
 let g:session_autosave        = 'yes'
 let g:session_default_to_last = 'yes'
+let g:ale_virtualtext_cursor=0
 
+function! ToggleALE()
+  if exists('g:ale_enabled') && g:ale_enabled
+    let g:ale_enabled = 0
+    " Clear ALE signs, loclist, and highlights
+    ALEDisable
+    lclose
+    call ale#engine#Cleanup(0)
+    echo "ALE disabled"
+  else
+    let g:ale_enabled = 1
+    ALEEnable
+    echo "ALE enabled"
+  endif
+endfunction
+
+
+nnoremap <leader>al :call ToggleALE()<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                                   Pasting                                    "
@@ -603,7 +663,7 @@ nmap Y v$y
 "colorscheme base16-apathy
 "colorscheme base16-darktooth
 "colorscheme base16-brewer
-set background=light
+set background=dark
 let g:airline_base16_apathy = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -672,6 +732,14 @@ au BufNewFile,BufReadPost *.py setl foldmethod=indent nofoldenable
 au BufNewFile,BufReadPost *.py setl shiftwidth=4 expandtab
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"                                      C                                       "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+autocmd FileType *.c setlocal ts=4 sts=4 sw=4
+au BufNewFile,BufReadPost *.c setl foldmethod=indent nofoldenable
+au BufNewFile,BufReadPost *.c setl shiftwidth=4 expandtab
+au BufNewFile,BufReadPost *.h set filetype=c
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                                  LaTeX/TeX                                   "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 au BufNewFile,BufReadPost *.tex colorscheme vividchalk
@@ -730,7 +798,6 @@ nnoremap Q yt=A<C-r>=<C-r>"<CR><Esc>
 " Show tabs in make files
 set list
 set listchars=tab:>-
-nmap <leader>m :set expandtab tabstop=2 shiftwidth=2 softtabstop=2<CR>
 set listchars=trail:-
 
 " place result of last g command in new window

@@ -577,7 +577,14 @@ highlight DiffAdd term=reverse cterm=bold ctermbg=green ctermfg=white
 highlight DiffChange term=reverse cterm=bold ctermbg=cyan ctermfg=black
 highlight DiffText term=reverse cterm=bold ctermbg=gray ctermfg=black
 highlight DiffDelete term=reverse cterm=bold ctermbg=red ctermfg=black
+
+if &t_Co > 2 || has("gui_running")
+  " Enable syntax highlighting
+  syntax on
+endif
+
 if has("autocmd")
+
   " Enable filetype detection
   filetype plugin indent on
 
@@ -586,11 +593,58 @@ if has("autocmd")
     \ if line("'\"") > 1 && line("'\"") <= line("$") |
     \   exe "normal! g`\"" |
     \ endif
-endif
-if &t_Co > 2 || has("gui_running")
-  " Enable syntax highlighting
-  syntax on
-endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"                                     Ruby                                     "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    autocmd FileType *.ruby setlocal ts=2 sts=2 sw=2
+    autocmd FileType *.rb setlocal ts=2 sts=2 sw=2
+    au BufNewFile,BufReadPost *.rb setl foldmethod=indent nofoldenable
+    au BufNewFile,BufReadPost *.ruby setl shiftwidth=2 expandtab
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"                                    Python                                    "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    autocmd FileType *.py setlocal ts=4 sts=4 sw=4
+    au BufNewFile,BufReadPost *.py setl foldmethod=indent nofoldenable
+    au BufNewFile,BufReadPost *.py setl shiftwidth=4 expandtab
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"                                     Make                                     "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    autocmd FileType make setlocal ts=4 sts=4 sw=4 noexpandtab
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"                                      C                                       "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    autocmd FileType *.c setlocal ts=4 sts=4 sw=4
+    au BufNewFile,BufReadPost *.c setl foldmethod=indent nofoldenable
+    au BufNewFile,BufReadPost *.c setl shiftwidth=4 expandtab
+    au BufNewFile,BufReadPost *.h set filetype=c
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"                                  LaTeX/TeX                                   "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    au BufNewFile,BufReadPost *.tex colorscheme vividchalk
+
+    let g:airline_detect_modified=1
+    let g:airline_detect_spell=1
+    function! AirlineInit()
+      let g:airline#extensions#branch#enabled       = 1
+      let g:airline#extensions#branch#empty_message = ''
+      set laststatus=2
+    endfunction
+
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    "                                   Markdown                                   "
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    autocmd FileType markdown setlocal wrap
+    autocmd FileType markdown setlocal formatoptions-=t
+    autocmd FileType markdown setlocal nonumber
+
+    autocmd User AirlineAfterInit call AirlineInit()
+endif " has("autocmd")
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                              Clip Board Control                              "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -711,55 +765,6 @@ function! NextClosedFold(dir)
     endif
 endfunction
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"                                     Ruby                                     "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType *.ruby setlocal ts=2 sts=2 sw=2
-autocmd FileType *.rb setlocal ts=2 sts=2 sw=2
-au BufNewFile,BufReadPost *.rb setl foldmethod=indent nofoldenable
-au BufNewFile,BufReadPost *.ruby setl shiftwidth=2 expandtab
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"                                 Coffeescript                                 "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
-au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"                                    Python                                    "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType *.py setlocal ts=4 sts=4 sw=4
-au BufNewFile,BufReadPost *.py setl foldmethod=indent nofoldenable
-au BufNewFile,BufReadPost *.py setl shiftwidth=4 expandtab
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"                                      C                                       "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType *.c setlocal ts=4 sts=4 sw=4
-au BufNewFile,BufReadPost *.c setl foldmethod=indent nofoldenable
-au BufNewFile,BufReadPost *.c setl shiftwidth=4 expandtab
-au BufNewFile,BufReadPost *.h set filetype=c
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"                                  LaTeX/TeX                                   "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-au BufNewFile,BufReadPost *.tex colorscheme vividchalk
-
-let g:airline_detect_modified=1
-let g:airline_detect_spell=1
-function! AirlineInit()
-  let g:airline#extensions#branch#enabled       = 1
-  let g:airline#extensions#branch#empty_message = ''
-  set laststatus=2
-endfunction
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"                                   Markdown                                   "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType markdown setlocal wrap
-autocmd FileType markdown setlocal formatoptions-=t
-autocmd FileType markdown setlocal nonumber
-
-autocmd User AirlineAfterInit call AirlineInit()
 "let g:airline#extensions#tabline#enabled = 1
 
 "copy (write) highlighted text to .vimbuffer

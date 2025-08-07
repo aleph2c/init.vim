@@ -1,4 +1,93 @@
 ################################################################################
+#                               Table of Contents                              #
+#                                                                              #
+# Use this table to find the snippet trigger for a specific XSLT feature.      #
+# Search for the trigger name (e.g., "snippet start") to jump to the definition#
+# and see detailed usage instructions.                                         #
+################################################################################
+#
+#   XSLT Feature                  | Snippet Trigger(s)
+#  -------------------------------|---------------------------------------------
+#   **File Setup & Structure**    |
+#  -------------------------------|---------------------------------------------
+#   Full Stylesheet Boilerplate   | start
+#   Global Mode (XSLT 3.0)        | mode3
+#   Strip Whitespace              | strip
+#   Preserve Whitespace           | preserve-space
+#   Namespace Declaration         | ...ns (e.g., mapns)
+#   Namespace Alias               | namespace-alias
+#   Exclude Namespace             | remove-ns
+#                                 |
+#  -------------------------------|---------------------------------------------
+#   **Templates**                 |
+#  -------------------------------|---------------------------------------------
+#   Matching Template             | template, detailed-template
+#   Named Template                | named-template
+#   Call Named Template           | call-template
+#   Apply Templates (Children)    | apply
+#   Apply Templates (Select)      | applys, applyd
+#                                 |
+#  -------------------------------|---------------------------------------------
+#   **Variables & Parameters**    |
+#  -------------------------------|---------------------------------------------
+#   Variable (from select)        | var, var-stair
+#   Variable (from content)       | var-sandwich
+#   Variable (from document)      | var-doc
+#   Global Parameter              | param-global
+#   Template/Function Parameter   | param
+#   Pass Parameter to Template    | with-param
+#                                 |
+#  -------------------------------|---------------------------------------------
+#   **Control Flow**              |
+#  -------------------------------|---------------------------------------------
+#   If Condition                  | if
+#   Choose/When/Otherwise         | choose, when, otherwise
+#   For-Each Loop                 | for-each
+#   For-Each-Group Loop           | for-each-group
+#   Numeric Range Loop            | range
+#   Sort                          | sort
+#                                 |
+#  -------------------------------|---------------------------------------------
+#   **Node & Value Output**       |
+#  -------------------------------|---------------------------------------------
+#   Output Value of Expression    | value, value-escaping
+#   Create Element                | element, element-attrs
+#   Create Attribute              | attribute
+#   Create Attribute Set          | attribute-set
+#   Shallow Copy Node             | copy, copy-attrs
+#   Deep Copy Node(s)             | copy-of
+#   Output Text                   | text, text-disable
+#   Stylesheet Comment            | --, comment-stylesheet
+#   Result Tree Comment           | comment-dynamic
+#   CDATA Section                 | cdata
+#                                 |
+#  -------------------------------|---------------------------------------------
+#   **Functions & Advanced**      |
+#  -------------------------------|---------------------------------------------
+#   Define Key for Indexing       | key
+#   Define Function               | fn, private-fn
+#   Numbering                     | number, numberd, numberdd
+#   String Normalization          | normalize
+#   Regex String Analysis         | analyze, matching
+#   Dynamic XPath Evaluation      | evaluate
+#                                 |
+#  -------------------------------|---------------------------------------------
+#  **Maps & Sequences (XSLT 3.0)**|
+#  -------------------------------|---------------------------------------------
+#   Create Map                    | map
+#   Create Map Entry              | map-entry
+#   Create Sequence               | sequence, sequence-for-each
+#                                 |
+#  -------------------------------|---------------------------------------------
+#   **Utilities & Debugging**     |
+#  -------------------------------|---------------------------------------------
+#   Command-line Usage Comment    | usage, program-param
+#   Output Message to Console     | message
+#   "Reflect" Variable to Console | reflect
+#   Special Characters            | -nl (newline), -sp (space), -< (lt), -> (gt)
+#   Special Characters (w/text)   | newline, space, tab
+#
+################################################################################
 #                            Comparison operators                              #
 ################################################################################
 # location paths, location steps, axis, node test, predicats: Otegem p.154
@@ -33,17 +122,48 @@ def from_options(t, options):
 
 endglobal
 
-# select the text (it can be multiline)
-# ctrl-j
-# --
-# ctrl-j
-snippet -- "comment"
+# -----------------------------------------------------------------
+# Visual Trigger:  --
+# Description:     Wraps the currently selected block of code in a
+#                  standard XML comment within the stylesheet.
+# Workflow:
+#   1. Select one or more lines of code in visual mode.
+#   2. Press ctrl-j, which clears the selection and enters snippet mode.
+#   3. Type "--" and the selected code will be wrapped in a comment.
+# Result: The previously selected code is now a stylesheet comment.
+# -----------------------------------------------------------------
+snippet -- "stylesheet comment"
 <!--
 ${VISUAL}
 -->$0
 endsnippet
 
-# <xsl:output method="html" version="5.0" encoding="UTF-8" indent="yes" />
+# -----------------------------------------------------------------
+# Text Trigger:   start
+# Description:    Generates a complete, feature-rich boilerplate for a
+#                 new XSLT 3.0 stylesheet. It interactively configures
+#                 the xsl:output settings and provides stubs for
+#                 other common snippets.
+#
+# Workflow:
+#   1. In an empty file, type "start" and press ctrl-j.
+#   2. The entire stylesheet structure appears. Your cursor will be
+#      at the first placeholder in the <xsl:output> element.
+#   3. You will be prompted with a list of choices for the `method`
+#      attribute. Type your choice and press ctrl-j.
+#   4. You will then be prompted for the output `version` and
+#      `indent` attributes in the same way.
+#   5. Next, you will be prompted to insert a 'usage' or
+#      'program-param' block.
+#   6. After the interactive setup, the snippet leaves behind several
+#      text triggers ('mode3', 'template', 'strip') for you to
+#      manually expand with other snippets to continue building the file.
+#   7. It also includes a default "catch-all" template to help debug
+#      by warning about any elements that are not explicitly matched.
+#
+# Result: A ready-to-use XSLT 3.0 file skeleton, configured to your
+#         specifications, with placeholders for further code generation.
+# -----------------------------------------------------------------
 snippet start "Setting up the top of the file"
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="3.0"
@@ -87,6 +207,16 @@ template
 </xsl:stylesheet>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   usage
+# Description:    Generates a comment block showing example command-line
+#                 usage for running the stylesheet, for documentation.
+# Workflow:
+#   1. Type "usage" and press ctrl-j.
+#   2. Fill in the placeholders for the XSLT processor, directories,
+#      and filenames.
+# Result: A formatted comment block with example usage instructions.
+# -----------------------------------------------------------------
 snippet usage "Describe how to use the program"
 <!--
   $1`!p snip.rv=from_options(t[1], [
@@ -101,6 +231,18 @@ snippet usage "Describe how to use the program"
 -->
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   program-param
+# Description:    Generates a command-line usage comment block that
+#                 includes an example of passing a parameter, and also
+#                 stubs out the corresponding <xsl:param> element.
+# Workflow:
+#   1. Type "program-param" and press ctrl-j.
+#   2. Fill in the placeholders for the command-line tool and files.
+#   3. Fill in the example parameter and its value in the comment.
+#   4. Fill in the <xsl:param> name and default value in the code.
+# Result: A usage comment and a matching <xsl:param> declaration.
+# -----------------------------------------------------------------
 snippet program-param "Add a program Param"
 <!--
   $1`!p snip.rv=from_options(t[1], [
@@ -117,51 +259,195 @@ snippet program-param "Add a program Param"
 <xsl:param name="$8">$9</xsl:param>
 endsnippet
 
-# XSLT 3.0
-# shallow-skip: causes all node that are not matched (including text nodes)
-#               to be skipped
-# fail:         treats a no-match as an error
-# true:         results in a warning
+# -----------------------------------------------------------------
+# Text Trigger:   mode3
+# Description:    Inserts an XSLT 3.0 global <xsl:mode> declaration,
+#                 allowing you to interactively set the default
+#                 behavior for all nodes that are not explicitly matched.
+#
+# Workflow:
+#   1. At a valid position in your stylesheet, type "mode3" and press ctrl-j.
+#   2. The <xsl:mode> tag will appear.
+#   3. You will be prompted with a list of choices for the
+#      `on-no-match` attribute:
+#        - shallow-skip: Skips unmatched nodes but still processes their children.
+#        - fail:         Throws an error, stopping the transformation.
+#        - true:         Issues a warning but continues processing.
+#   4. Select your desired behavior and complete the snippet.
+#
+# Result: A single <xsl:mode> element that defines the global rule
+#         for handling unmatched nodes.
+# -----------------------------------------------------------------
 snippet mode3 "Set the mode for the spreadsheet"
 <xsl:mode on-no-match="$1`!p snip.rv=from_options(t[1], [
 'shallow-skip', 'fail', 'true'
 ])`" />
 endsnippet
 
-snippet "(.)ns" "Name space" r
-`!p snip.rv = match.group(1) if match.group(1) else ""`xmlns:$1="http://www.$2"
-$0
+# -----------------------------------------------------------------
+# RegEx Trigger:  (\w+)ns
+# Description:    Creates a complete XML namespace (xmlns) attribute. The
+#                 prefix for the namespace is taken from the trigger text.
+#
+# Workflow:
+#   1. At a valid position (e.g., inside an opening tag), type a
+#      prefix followed by "ns". Examples: "xns", "lfnns".
+#   2. Press ctrl-j.
+#   3. The snippet expands into a full `xmlns:prefix="uri"` attribute.
+#   4. The prefix will be correctly filled in. Your cursor will be
+#      inside the quotes, ready for you to type the namespace URI.
+#
+# Example:
+#   - Typing "xns" + ctrl-j becomes: xmlns:x="[cursor is here]"
+#   - Typing "mapns" + ctrl-j becomes: xmlns:map="[cursor is here]"
+# -----------------------------------------------------------------
+snippet "(\w+)ns" "Name space" r
+xmlns:${1:`!p snip.rv = match.group(1)`}="${2:uri}"$0
 endsnippet
 
-# result-prefix - the namespace you want in the output
-# stylesheet-prefix - the namespace used in this sheet
+# -----------------------------------------------------------------
+# Text Trigger:   namespace-alias
+# Description:    Inserts an <xsl:namespace-alias> element. This maps a
+#                 namespace URI used in the stylesheet to a different
+#                 namespace URI in the result tree. It's often used when
+#                 writing XSLT that generates XSLT.
+# Workflow:
+#   1. At a top-level position in the stylesheet, type "namespace-alias"
+#      and press ctrl-j.
+#   2. Fill in the `stylesheet-prefix` to identify the namespace in your code.
+#   3. Fill in the `result-prefix` to define what it should become in the output.
+# Result: An <xsl:namespace-alias> element.
+# -----------------------------------------------------------------
 snippet namespace-alias "Setup a namespace alias"
 <xsl:namespace-alias stylesheet-prefix="$1" result-prefix="$2" />
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   remove-ns
+# Description:    Inserts an <xsl:exclude-result-prefixes> attribute into
+#                 the main <xsl:stylesheet> element. This prevents the
+#                 namespace declarations for the given prefixes from
+#                 appearing in the output document.
+# Workflow:
+#   1. Inside the opening <xsl:stylesheet> tag, type "remove-ns" and press ctrl-j.
+#   2. Enter the prefix (or a space-separated list of prefixes) to exclude.
+# Result: An `exclude-result-prefixes` attribute.
+# -----------------------------------------------------------------
 snippet remove-ns "Remove a namespace"
 <xsl:exclude-result-prefixes="$1" />$0
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   with-param
+# Description:    Inserts an <xsl:with-param> element, used inside
+#                 an <xsl:call-template> or <xsl:apply-templates>
+#                 to pass a parameter to the called template.
+#
+# Workflow:
+#   1. Inside a call-template or apply-templates block, type
+#      "with-param" and press ctrl-j.
+#   2. The element will appear. Your cursor will be on the `name`
+#      attribute to enter the parameter's name.
+#   3. Press ctrl-j to jump to the element's content, where you can
+#      provide the value for the parameter (e.g., a literal value
+#      or an <xsl:value-of> expression).
+#
+# Result: A complete <xsl:with-param> element, ready to be filled out.
+# -----------------------------------------------------------------
 snippet with-param "Parameter for a call"
 <xsl:with-param name="$1">$2</xsl:with-param>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   param-global
+# Description:    Inserts a global <xsl:param> element. These are defined
+#                 at the top level of a stylesheet and can receive values
+#                 from the outside environment (e.g., command line).
+# Workflow:
+#   1. At a top-level position, type "param-global" and press ctrl-j.
+#   2. Enter the parameter's `name`.
+#   3. Enter its default value between the tags.
+# Result: A global <xsl:param> with a default value.
+# -----------------------------------------------------------------
 snippet param-global "A global input parameter"
 <xsl:param name="$1">$2</xsl:param>$0
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   param
+# Description:    Inserts a self-closing <xsl:param> element, used at
+#                 the top of an <xsl:template> or <xsl:function> to
+#                 declare a parameter it can receive.
+#
+# Workflow:
+#   1. At the top of a template or function, type "param" and press ctrl-j.
+#   2. The element will appear. Your cursor will be on the `name`
+#      attribute to enter the parameter's name.
+#   3. Press ctrl-j to jump to the `as` attribute, where you can define
+#      the parameter's data type (e.g., `xs:string`, `map(*)`).
+#   4. The snippet completes with the cursor positioned after the element.
+#
+# Result: A complete <xsl:param> declaration, ready for use within its
+#         parent template or function.
+# -----------------------------------------------------------------
 snippet param "A template/function parameter"
 <xsl:param name="$1" as="$2" />$0
 endsnippet
 
+
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  template
+# Description:          Creates an <xsl:template> element. It can either
+#                       generate a new, empty template or wrap a block
+#                       of existing code within a new template.
+#
+# ---
+# Workflow 1 (Creating a new empty template):
+#   1. Type "template" and press ctrl-j.
+#   2. An empty <xsl:template> element is created.
+#   3. Your cursor is on the `match` attribute. Enter the XPath expression.
+#   4. Press ctrl-j to move the cursor inside the template body, ready for coding.
+#
+# ---
+# Workflow 2 (Wrapping existing code):
+#   1. Select one or more lines of code in visual mode.
+#   2. Press ctrl-j, which clears the selection and enters snippet mode.
+#   3. Type "template".
+#   4. The previously selected code is now wrapped inside a new <xsl:template>.
+#   5. Your cursor is on the `match` attribute. Enter the XPath expression.
+#   6. The final cursor position will be inside the template, after the
+#      code you wrapped.
+# -----------------------------------------------------------------
 snippet template "Creating a template"
 <xsl:template match="$1">
   ${VISUAL}$0
 </xsl:template>
-
 endsnippet
 
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  named-template
+# Description:          Creates a named <xsl:template> element, which
+#                       can be called using <xsl:call-template>. It can
+#                       either generate a new, empty template or wrap
+#                       a block of existing code within a new template.
+#
+# ---
+# Workflow 1 (Creating a new empty template):
+#   1. Type "named-template" and press ctrl-j.
+#   2. An empty <xsl:template> element is created.
+#   3. Your cursor is on the `name` attribute. Enter the template's name.
+#   4. Press ctrl-j to move the cursor inside the template body, ready for coding.
+#
+# ---
+# Workflow 2 (Wrapping existing code):
+#   1. Select one or more lines of code in visual mode.
+#   2. Press ctrl-j, which clears the selection and enters snippet mode.
+#   3. Type "named-template".
+#   4. The previously selected code is now wrapped inside a new named <xsl:template>.
+#   5. Your cursor is on the `name` attribute. Enter the template's name.
+#   6. The final cursor position will be inside the template, after the
+#      code you wrapped.
+# -----------------------------------------------------------------
 snippet named-template "Creating a named template"
 <xsl:template name="$2">
   ${VISUAL}$0
@@ -169,95 +455,356 @@ snippet named-template "Creating a named template"
 
 endsnippet
 
-snippet templated "Create a detailed template"
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  detailed-template
+# Description:          Creates an <xsl:template> with `match`, `mode`,
+#                       and `priority` attributes for fine-grained control
+#                       over template selection.
+# Workflow:
+#   1. Type "detailed-template" and press ctrl-j.
+#   2. Fill in the `match` pattern.
+#   3. Fill in the `mode`.
+#   4. Select a `priority` from the interactive list.
+#   5. Can also be used to wrap a visual selection.
+# Result: A highly specific <xsl:template> rule.
+# -----------------------------------------------------------------
+snippet detailed-template "Create a detailed template"
 <xsl:template match="$1" mode="$2" priority="$3`!p snip.rv=from_options(t[3], ['0.0', '-0.25', '0.25', '0.5'])`">
   ${VISUAL}$0
 </xsl:template>
 
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   call-template
+# Description:    Inserts an <xsl:call-template> element to invoke a
+#                 named template. It includes a placeholder to remind
+#                 you to add parameters if needed.
+#
+# Workflow:
+#   1. At the position where you want to call a named template,
+#      type "call-template" and press ctrl-j.
+#   2. The <xsl:call-template> block appears. Your cursor will be on
+#      the `name` attribute to enter the name of the template you
+#      wish to call.
+#   3. Press ctrl-j. The cursor moves inside the block, and the
+#      literal text "with-param" is highlighted.
+#   4. You can now choose your next action:
+#        - If you need to pass a parameter, simply press ctrl-j again
+#          to expand the "with-param" snippet.
+#        - If you do not need to pass a parameter, simply delete the
+#          "with-param" text.
+#
+# Result: A complete call to a named template, pre-staged for optionally
+#         adding parameters.
+# -----------------------------------------------------------------
 snippet call-template "Call a named template"
 <xsl:call-template name="$1">
   with-param$0
 </xsl:call-template>
 endsnippet
 
+# -----------------------------------------------------------------
+# NOTE: The initial "(.)?" in the trigger is a pattern in these
+#       snippets that doesn't alter the output but may support a
+#       user-specific typing habit.
+# -----------------------------------------------------------------
+# Visual Trigger: value (or xvalue, etc.)
+# Description:    Wraps the currently selected text (presumably an XPath
+#                 expression) in an <xsl:value-of> element.
+#
+# Workflow:
+#   1. Select an XPath expression in visual mode (e.g., `item/@name`).
+#   2. Press ctrl-j, then type "value".
+#   3. The selection gets wrapped inside the `select` attribute of
+#      a new <xsl:value-of> element.
+#
+# Example:
+#   - Selecting `current-date()` and triggering becomes:
+#     <xsl:value-of select="current-date()" />
+# -----------------------------------------------------------------
 snippet "(.)?value" "Setting a value of" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:value-of select="${VISUAL}$1" />
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger: value-escaping (or xvalue-escaping, etc.)
+# Description:  Inserts a standard <xsl:value-of> element.
+#
+# Workflow:
+#   1. Type "value-escaping" and press ctrl-j.
+#   2. The snippet expands to <xsl:value-of select="" /> with the
+#      cursor inside the `select` attribute, ready for you to
+#      type the XPath expression.
+# -----------------------------------------------------------------
 snippet "(.)?value-escaping" "Setting a value of" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:value-of select="$1" />
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger: apply (or xapply, etc.)
+# Description:  Inserts a simple, self-closing <xsl:apply-templates />
+#               element to process all children of the current node.
+# -----------------------------------------------------------------
 snippet "(.)?apply" "Apply templates" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:apply-templates />$0
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger: applys (or xapplys, etc.)
+# Description:  Inserts an <xsl:apply-templates> with a `select`
+#               attribute to process a specific set of nodes.
+#
+# Workflow:
+#   1. Type "applys" and press ctrl-j.
+#   2. The snippet expands with the cursor inside the `select`
+#      attribute, ready for your XPath expression.
+# -----------------------------------------------------------------
 snippet "(.)?applys" "Apply template with select" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:apply-templates select="$1" />$0
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger: applyd (or xapplyd, etc.)
+# Description:  Inserts a detailed <xsl:apply-templates> with `select`,
+#               `mode`, and an interactive `priority`.
+#
+# Workflow:
+#   1. Type "applyd" and press ctrl-j.
+#   2. Cursor starts on the `select` attribute.
+#   3. ctrl-j moves to `mode`. Default is "#all".
+#   4. ctrl-j moves to `priority` and presents a list of common
+#      priority values to choose from.
+# -----------------------------------------------------------------
 snippet "(.)?applyd" "Apply detailed template" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:apply-templates select="$1" mode="${2:#all}" priority="$3`!p snip.rv=from_options(t[3], ['0.0', '-0.25', '0.25', '0.5'])`" />$0
 endsnippet
 
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  element (or xelement, etc.)
+# Description:          Creates an <xsl:element> to dynamically generate
+#                       an element in the output. Can be empty or wrap
+#                       existing code.
+#
+# Workflow (Text):
+#   1. Type "element" + ctrl-j.
+#   2. An <xsl:element> is created with the `name` attribute defaulting
+#      to "{name()}" (an AVT to copy the current element's name).
+#   3. You can override the name or press ctrl-j to move inside the body.
+#
+# Workflow (Visual):
+#   1. Select existing code, press ctrl-j, then type "element".
+#   2. The selected code is wrapped inside the <xsl:element>.
+#   3. The cursor is on the `name` attribute.
+# -----------------------------------------------------------------
 snippet "(.)?element" "Programmatically define an element" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:element name="${1:\{name()\}}">
   ${VISUAL}$0
 </xsl:element>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  element-attrs
+# Description:          Creates an <xsl:element> that applies a pre-defined
+#                       <xsl:attribute-set>.
+#
+# Workflow:
+#   1. Trigger with "element-attrs".
+#   2. Cursor is on the `name` attribute for the new element's name.
+#   3. ctrl-j moves to `use-attribute-sets` to specify which set to apply.
+#   4. Can also wrap a visual selection like the standard `element` snippet.
+# -----------------------------------------------------------------
 snippet "element-attrs" "Programmatically define an attribute with an attribute set" 
 <xsl:element name="$1" use-attribute-sets="$2">
   ${VISUAL}$0
 </xsl:element>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   attribute-set
+# Description:    Creates an <xsl:attribute-set> block, used to define
+#                 a named, reusable collection of attributes.
+#
+# Workflow:
+#   1. Type "attribute-set" + ctrl-j.
+#   2. Cursor is on the `name` attribute to name the set.
+#   3. ctrl-j moves the cursor inside, pre-filled with the trigger
+#      for the `attribute` snippet, ready to be expanded.
+# -----------------------------------------------------------------
 snippet "attribute-set" "Create an attribute set"
 <xsl:attribute-set name="$1">
   attribute$0
 </xsl:attribute-set>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   attribute (or xattribute, etc.)
+# Description:    Inserts an <xsl:attribute> element to dynamically add
+#                 an attribute to a generated element.
+#
+# Workflow:
+#   1. Inside a generated element (e.g., inside <xsl:element>),
+#      type "attribute" and press ctrl-j.
+#   2. An <xsl:attribute> tag appears. The `name` attribute defaults to
+#      "{name()}", a common pattern for copying the name of the current
+#      attribute being processed.
+#   3. You can override the name, or press ctrl-j to move inside the
+#      tag to define the attribute's value. The value can be plain
+#      text or generated by other XSLT instructions like <xsl:value-of>.
+#
+# Result: A complete <xsl:attribute> instruction, ready to be filled out.
+# -----------------------------------------------------------------
 snippet "(.)?attribute" "Programmatically define an attribute" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:attribute name="${1:\{name()\}}">$0</xsl:attribute>
 endsnippet
 
+# -----------------------------------------------------------------
+# Visual Trigger:  copy
+# Description:     Wraps the selected block of code in an <xsl:copy>
+#                  element. This performs a "shallow copy" of the
+#                  current node (i.e., it copies the node tag itself, but
+#                  not its attributes or children). The code you wrap
+#                  inside is what defines the new attributes and children
+#                  for the copied node.
+#
+# Workflow:
+#   1. Select the code that will define the contents (attributes and
+#      children) of the newly created node.
+#   2. Press ctrl-j, which clears the selection and enters snippet mode.
+#   3. Type "copy".
+#
+# Result: The selected code is now inside an <xsl:copy> element,
+#         allowing you to control what gets generated inside the
+#         shallow-copied node.
+# -----------------------------------------------------------------
 snippet copy "Shallow copy"
 <xsl:copy>
   ${VISUAL}$0
 </xsl:copy>
 endsnippet
 
+# -----------------------------------------------------------------
+# Visual Trigger:  copy-attrs
+# Description:     Performs a shallow copy of the current node and applies
+#                  a pre-defined <xsl:attribute-set> to the newly
+#                  created element. It also wraps any selected code
+#                  to define the node's children.
+#
+# Workflow:
+#   1. Select the code that will define the children of the new node.
+#      (You can also start with no selection to create an empty body).
+#   2. Press ctrl-j, which clears the selection and enters snippet mode.
+#   3. Type "copy-attrs".
+#   4. The <xsl:copy> element appears, with your selected code inside.
+#   5. Your cursor will be on the `use-attribute-sets` attribute,
+#      ready for you to enter the name of the attribute set to apply.
+#   6. Press ctrl-j to move inside the element after your wrapped code.
+#
+# Result: A shallow copy that is efficiently decorated with a reusable
+#         set of attributes.
+# -----------------------------------------------------------------
 snippet copy-attrs "Shallow copy with attribute set"
 <xsl:copy use-attribute-sets="$1">
   ${VISUAL}$0
 </xsl:copy>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   copy-of (or xcopy-of, etc.)
+# Description:    Inserts an <xsl:copy-of> element, which performs a "deep copy"
+#                 of a node or node-set. A deep copy includes the node itself
+#                 plus all of its attributes, children, and other descendants,
+#                 preserving the entire structure exactly.
+#
+# Workflow:
+#   1. At the position where you want to insert the deep copy,
+#      type "copy-of" and press ctrl-j.
+#   2. The <xsl:copy-of> element will appear.
+#   3. Your cursor will be inside the `select` attribute, ready for
+#      you to enter the XPath expression for the node(s) you wish
+#      to copy completely.
+#
+# Result: A single instruction that copies an entire XML fragment from
+#         the source to the output without modification.
+# -----------------------------------------------------------------
 snippet "(.)?copy-of" "Deep copy" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:copy-of select="$1" />
 endsnippet
 
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  for-each
+# Description:          Creates an <xsl:for-each> instruction to iterate
+#                       over a node-set defined in the `select` attribute.
+#                       It can either create a new empty loop or wrap
+#                       existing code to be executed for each iteration.
+#
+# ---
+# Workflow 1 (Creating a new empty loop):
+#   1. Type "for-each" and press ctrl-j.
+#   2. An empty <xsl:for-each> block is created.
+#   3. Your cursor is on the `select` attribute, ready for you to
+#      enter the XPath for the nodes you want to loop over.
+#   4. Press ctrl-j to move the cursor inside the loop body.
+#
+# ---
+# Workflow 2 (Wrapping existing code):
+#   1. Select one or more lines of code in visual mode.
+#   2. Press ctrl-j, then type "for-each".
+#   3. The selected code is now wrapped inside a new <xsl:for-each> block.
+#   4. Your cursor is on the `select` attribute, ready for the XPath.
+#   5. The final cursor position will be inside the loop, after the
+#      code you wrapped.
+# -----------------------------------------------------------------
 snippet for-each "For each"
 <xsl:for-each select="$1">
   ${VISUAL}$0
 </xsl:for-each>
 endsnippet
 
-#  Usage example:
-#  <xsl:for-each-group select="//xhtml:article/xhtml:div/xhtml:div/*" group-starting-with="xhtml:h1">
-#    <xsl:if test="self::xhtml:h1[@id='observe']">
-#      <xsl:for-each-group select="current-group() except ." group-starting-with="xhtml:h2">
-#    </xsl:if>
-#  </xsl:for-each-group>
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  for-each-group
+# Description:          Creates an <xsl:for-each-group> instruction to
+#                       iterate over a sequence, grouping adjacent items
+#                       based on a specified condition (e.g., group all
+#                       elements that appear after a heading).
+# Workflow:
+#   1. Type "for-each-group" and press ctrl-j.
+#   2. Fill in the `select` attribute with the XPath for all items to consider.
+#   3. Fill in the `group-starting-with` attribute with a pattern that
+#      identifies the first item of each new group.
+#   4. The snippet can also wrap a visual selection.
+# Result: An <xsl:for-each-group> block.
+# -----------------------------------------------------------------
 snippet for-each-group "For each group"
 <xsl:for-each-group select="$1" group-starting-with="$2">
   ${VISUAL}$0
-</xsl:for-each>
+</xsl:for-each-group>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  range
+# Description:          Generates the XSLT structure for a traditional
+#                       numbered "for loop", iterating from 1 to a specified
+#                       upper bound. Crucially, inside the loop, it provides
+#                       a variable named `$index` which holds the current
+#                       iteration number (1, 2, 3, etc.) for easy use.
+#
+# ---
+# Workflow 1 (Creating a new empty loop):
+#   1. Type "range" and press ctrl-j.
+#   2. The entire loop structure is created. Your cursor is on the
+#      first placeholder, `$1`.
+#   3. Enter the number of times you want the loop to run (e.g., `10`).
+#   4. Press ctrl-j to move the cursor inside the loop body, ready for coding.
+#
+# ---
+# Workflow 2 (Wrapping existing code):
+#   1. Select the code you want to be the body of the loop.
+#   2. Press ctrl-j, then type "range".
+#   3. The selected code is now wrapped inside the loop structure.
+#   4. Your cursor is on the placeholder `$1`. Enter the number of iterations.
+#   5. The final cursor position will be inside the loop, after your wrapped code.
+# -----------------------------------------------------------------
 snippet range "Loop over a range"
 <!-- range(1, $1) -->
 <xsl:variable name="indexes" as="xs:integer*">
@@ -270,37 +817,133 @@ snippet range "Loop over a range"
   <!-- $index contains your iteration number -->
   ${VISUAL}$0
 </xsl:for-each>
-
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   strip
+# Description:    Inserts an <xsl:strip-space> declaration with a
+#                 wildcard. This is a top-level instruction that tells
+#                 the XSLT processor to remove all whitespace-only
+#                 text nodes (e.g., indentation, blank lines) from
+#                 the source XML document before processing begins.
+#
+# Workflow:
+#   1. At a valid top-level position in your stylesheet (usually
+#      near the top, after <xsl:output>), type "strip" and press ctrl-j.
+#
+# Result: A single <xsl:strip-space elements="*" /> line is added.
+#         This globally alters how the source tree is parsed, which
+#         is useful for preventing unwanted whitespace from
+#         "pretty-printed" source files from appearing in the output.
+# -----------------------------------------------------------------
 snippet strip "Stripe white space"
 <xsl:strip-space elements="*" />
 endsnippet
 
-# normalize-space is an XPath expression
+# -----------------------------------------------------------------
+# Text Trigger:   normalize (or xnormalize, etc.)
+# Description:    Inserts the `normalize-space()` XPath function. This
+#                 function takes a string (or a node, which it converts
+#                 to a string) and does three things:
+#                 1. Strips all leading and trailing whitespace.
+#                 2. Replaces any sequence of one or more whitespace
+#                    characters in the middle of the string with a
+#                    single space.
+#
+# Workflow:
+#   1. Inside an XPath expression (e.g., inside an attribute like
+#      `select` or `test`), type "normalize" and press ctrl-j.
+#   2. The function appears, with the cursor inside the parentheses.
+#   3. The default argument is ".", representing the current context node.
+#      You can accept this or replace it with a different XPath.
+#
+# Result: A call to the `normalize-space` function, ready to be used
+#         in your expression.
+# -----------------------------------------------------------------
 snippet "(.)?normalize" "Stripe white space from selection" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`normalize-space(${1:.})
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   preserve-space
+# Description:    Inserts an <xsl:preserve-space> declaration. This is a
+#                 top-level instruction that tells the XSLT processor
+#                 to keep whitespace-only text nodes for the specified
+#                 element(s). This is the opposite of `xsl:strip-space`
+#                 and is useful for elements where indentation and
+#                 line breaks are meaningful (e.g., `pre`, `code`).
+#
+# Workflow:
+#   1. At a valid top-level position in your stylesheet, type
+#      "preserve-space" and press ctrl-j.
+#   2. The <xsl:preserve-space> element appears, with the cursor on
+#      the `elements` attribute.
+#   3. Enter the name of the element (or a space-separated list of
+#      elements) for which you want to preserve whitespace.
+#
+# Result: A single <xsl:preserve-space> line that overrides any global
+#         stripping rules for specific elements.
+# -----------------------------------------------------------------
 snippet preserve-space "Preserve the white space for a/an element(s)"
 <xsl:preserve-space elements="$1" />$0
 endsnippet
 
-# <text xml:space="preserve">
-#   Canadian <athlete>sprinter</athlete> <person>John Benson</person>
-#   blah blah
-# </text>
-
+# -----------------------------------------------------------------
+# Text Trigger:   if (or xif, etc.)
+# Description:    Inserts an <xsl:if> block for conditional processing.
+#                 The content inside the block is only processed if the
+#                 XPath expression in the `test` attribute evaluates
+#                 to true.
+#
+# Workflow:
+#   1. Type "if" (or a variant like "xif") and press ctrl-j.
+#   2. The <xsl:if> block appears. Your cursor is on the `test`
+#      attribute.
+#   3. Enter the XPath expression that should evaluate to true or false.
+#   4. Press ctrl-j to move the cursor inside the block, ready
+#      to add the content that should be generated if the
+#      condition is met.
+#
+# Result: A standard conditional block, ready to be filled out.
+# -----------------------------------------------------------------
 snippet "(.)?if" "If statement" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:if test="$1">$2</xsl:if>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   choose
+# Description:    Inserts an <xsl:choose> block for multi-way conditional
+#                 branching (the XSLT equivalent of a switch or if/elif/else
+#                 structure). It immediately stages the creation of the
+#                 first <xsl:when> condition.
+#
+# Workflow:
+#   1. Type "choose" and press ctrl-j.
+#   2. The <xsl:choose> block appears. The cursor is placed inside,
+#      and the literal text "when" is highlighted.
+#   3. You can now immediately press ctrl-j again to expand the "when"
+#      snippet, which will create the first conditional <xsl:when> block.
+#
+# Result: A complete <xsl:choose> structure, ready for you to define
+#         its first conditional case.
+# -----------------------------------------------------------------
 snippet choose "Choose statement"
 <xsl:choose>
   when$0
 </xsl:choose>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   when
+# Description:    Inserts an <xsl:when> block inside an <xsl:choose> element.
+#                 This represents one of the conditional branches.
+# Workflow:
+#   1. Inside an <xsl:choose> block, type "when" and press ctrl-j.
+#   2. Fill in the `test` attribute with the condition.
+#   3. After filling the body, the snippet interactively prompts you
+#      to add another `when` or an `otherwise` block.
+# Result: A complete <xsl:when> block, ready for the next case.
+# -----------------------------------------------------------------
 snippet when "when statement"
 <xsl:when test="$1">
   
@@ -308,201 +951,399 @@ snippet when "when statement"
 $2`!p snip.rv=from_options(t[2], ['when', 'otherwise'])`$0
 endsnippet
 
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  otherwise
+# Description:          Inserts an <xsl:otherwise> block inside an
+#                       <xsl:choose> element. This is the default case
+#                       that executes if no preceding <xsl:when>
+#                       conditions are met.
+# Workflow:
+#   1. Inside an <xsl:choose>, after all <xsl:when> blocks, type
+#      "otherwise" and press ctrl-j.
+#   2. Can also be used to wrap a visual selection.
+# Result: The <xsl:otherwise> block.
+# -----------------------------------------------------------------
 snippet otherwise "otherwise"
 <xsl:otherwise>
   ${VISUAL}$0
 </xsl:otherwise>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   newline
+# Description:    Inserts an <xsl:text> element containing a literal
+#                 newline character. This is the reliable way to force
+#                 a line break in the output.
+# -----------------------------------------------------------------
 snippet "(.)?newline" "New Line" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:text>&#xA;</xsl:text>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   -nl
+# Description:    Inserts the character entity for a newline (`&#xA;`).
+#                 Useful inside other <xsl:text> blocks or attributes
+#                 that accept character entities.
+# -----------------------------------------------------------------
 snippet "(.)?-nl" "Newline Character" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`&#xA;
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   space
+# Description:    Inserts an <xsl:text> element containing a non-breaking
+#                 space character (`&#xA0;`).
+# -----------------------------------------------------------------
 snippet "(.)?space" "Space" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:text>&#xA0;</xsl:text>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   -sp
+# Description:    Inserts the character entity for a non-breaking space (`&#xA0;`).
+# -----------------------------------------------------------------
 snippet "(.)?-sp" "Space Character" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`&#xA0;
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   -<
+# Description:    Inserts the character entity for a less-than sign (`&lt;`).
+# -----------------------------------------------------------------
 snippet "(.)?-<" "Less than Character" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`&lt;
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   ->
+# Description:    Inserts the character entity for a greater-than sign (`&gt;`).
+# -----------------------------------------------------------------
 snippet "(.)?->" "Greater than Character" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`&gt;
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   tab
+# Description:    Inserts an <xsl:text> element containing a tab character.
+# -----------------------------------------------------------------
 snippet "(.)?tab" "tab" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:text>&#x9;</xsl:text>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  text
+# Description:          Inserts an <xsl:text> element. This instruction
+#                       outputs its content as literal text, preserving
+#                       all whitespace within it.
+# Workflow:
+#   1. Type "text" and press ctrl-j.
+#   2. Or, select existing text in visual mode and trigger the snippet.
+# Result: An <xsl:text> block.
+# -----------------------------------------------------------------
 snippet "(.)?text" "Add Text" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:text>${VISUAL}$0</xsl:text>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   text-disable
+# Description:    Inserts an <xsl:text> element with the attribute
+#                 `disable-output-escaping="yes"`. This allows you to
+#                 output text that looks like XML (e.g., `<br>`) without
+#                 it being escaped to `&lt;br&gt;`. Use with caution.
+# -----------------------------------------------------------------
 snippet "(.)?text-disable" "Add Text and disable output escaping" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<xsl:text disable-output-escaping="yes">$0</xsl:text>
 endsnippet
 
-snippet comment1 "Add a comment to the output XML/HTML" 
+# -----------------------------------------------------------------
+# Visual Trigger:  comment-dynamic
+# Description:     Creates a comment in the *output* document using the
+#                  <xsl:comment> instruction. The content of the comment
+#                  can be dynamically generated by other XSLT instructions.
+# Workflow:
+#   1. Select the content to be placed inside the comment.
+#   2. Press ctrl-j, then type "comment-dynamic".
+# Result: An <xsl:comment> block wrapping your selected content.
+# -----------------------------------------------------------------
+snippet comment-dynamic "Add a dynamic comment to the output" 
 <xsl:comment>
 ${VISUAL}$0
 </xsl:comment>
 endsnippet
 
-snippet comment "Add a comment to the output XML/HTML" 
+# -----------------------------------------------------------------
+# Visual Trigger:  comment-stylesheet
+# Description:     Creates a standard XML comment (`<!-- ... -->`) in the
+#                  *stylesheet* itself. This comment is for developers
+#                  and is ignored by the XSLT processor.
+# Workflow:
+#   1. Select the text you want to comment out.
+#   2. Press ctrl-j, then type "comment-stylesheet".
+# Result: The selected text wrapped in a `<!-- ... -->` block.
+# -----------------------------------------------------------------
+snippet comment-stylesheet "Add a comment to the stylesheet" 
 <!--
 ${VISUAL}$0
 -->
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   reflect
+# Description:    Uses <xsl:message> and <xsl:copy-of> to print the full
+#                 XML structure of a variable to the console during
+#                 transformation. This is extremely useful for debugging.
+# Workflow:
+#   1. Type "reflect" and press ctrl-j.
+#   2. Enter the name of the variable you want to inspect (without the $).
+# Result: An <xsl:message> block that will output the variable's contents.
+# -----------------------------------------------------------------
 snippet reflect "Use the message output to reflect upon a variable"
 <xsl:message>
   <xsl:copy-of select="\$$1"/>
 </xsl:message>
 endsnippet
 
+# -----------------------------------------------------------------
+# Visual Trigger:  cdata
+# Description:     Wraps the selected block of text in a CDATA section.
+#                  This prevents the XML parser from interpreting any
+#                  special characters (like <, >, &) within the section.
+# Workflow:
+#   1. Select the text you want to enclose in a CDATA section.
+#   2. Press ctrl-j, then type "cdata".
+# Result: The selected text wrapped in a `<![CDATA[...]]>` block.
+# -----------------------------------------------------------------
 snippet "(.)?cdata(.)?" "Add cdata" r
 `!p snip.rv = match.group(1) if match.group(1) else ""`<![CDATA[
 ${VISUAL}$0
 ]]>`!p snip.rv = match.group(2) if match.group(2) else ""`
 endsnippet
 
-snippet var "Add a variable"
+# -----------------------------------------------------------------
+# Visual Trigger:  var
+# Description:     Creates a self-closing <xsl:variable> with a `select`
+#                  attribute. Ideal for defining a variable from an XPath
+#                  expression.
+# Workflow:
+#   1. Select the desired name of the variable in visual mode.
+#   2. Press ctrl-j, then type "var".
+#   3. The `name` attribute is filled in. Your cursor moves to the
+#      `select` attribute to enter the XPath expression.
+# Result: `<xsl:variable name="your-selection" select="[cursor]" />`
+# -----------------------------------------------------------------
+snippet var "Add a variable with select"
 <xsl:variable name="${VISUAL}$1" select="$2" />
 endsnippet
 
-snippet var-sandwich "Add a variable"
+# -----------------------------------------------------------------
+# Visual Trigger:  var-sandwich
+# Description:     Creates an <xsl:variable> with opening and closing tags.
+#                  The content placed inside the tags becomes the variable's
+#                  value (as a result tree fragment or document node).
+# Workflow:
+#   1. Select the desired name of the variable in visual mode.
+#   2. Press ctrl-j, then type "var-sandwich".
+#   3. The `name` is filled in. Your cursor moves inside the block
+#      for you to add the content.
+# Result: `<xsl:variable name="your-selection">...</xsl:variable>`
+# -----------------------------------------------------------------
+snippet var-sandwich "Add a variable with content"
 <xsl:variable name="${VISUAL}$1">$2</xsl:variable>$0
 endsnippet
 
-snippet var-stair "Add a variable"
+# -----------------------------------------------------------------
+# Visual Trigger:  var-stair
+# Description:     Creates a multi-line, indented <xsl:variable> with a
+#                  `select` attribute. This improves readability for
+#                  long or complex XPath expressions.
+# Workflow:
+#   1. Select the desired name of the variable in visual mode.
+#   2. Press ctrl-j, then type "var-stair".
+#   3. The `name` is filled in. Your cursor moves to the `select`
+#      attribute on the next line.
+# Result: A cleanly formatted, multi-line `<xsl:variable>` declaration.
+# -----------------------------------------------------------------
+snippet var-stair "Add a formatted variable with select"
 <xsl:variable
   name="${VISUAL}$1"
   select="$2"
 />
 endsnippet
 
-snippet stair "Add a variable"
-<xsl:variable
-  name="${VISUAL}$1"
-  select="$2"
-/>
-endsnippet
-
-# <xsl:variable name="dishes" select="document('menu3.xml')//dish" />
+# -----------------------------------------------------------------
+# Visual Trigger:  var-doc
+# Description:     Creates an <xsl:variable> that loads an external XML
+#                  document using the `document()` function and selects
+#                  nodes from it.
+# Workflow:
+#   1. Select the URI of the document to load.
+#   2. Press ctrl-j, then type "var-doc".
+#   3. The `document()` function is filled in. Your cursor moves to
+#      the XPath part to select nodes, then to the variable name.
+# Result: An `<xsl:variable>` that reads from an external file.
+# -----------------------------------------------------------------
 snippet var-doc "Add a variable from a document"
 <xsl:variable name="$3" select="document('${VISUAL}$1')//$2" />
 endsnippet
 
-snippet varc "Make a complex variable"
-<xsl:variable name="$1">
-  ${VISUAL}$0
-</xsl:variable>
-endsnippet
-
-# /menu/entrees/dish[position() = ((($week - 1) mod count(/menu/appetizers/dish) + 1)]
-# select the line
-# ctrl-j
-# vars
-# fill in var name with weekentree
-snippet vars "Make a variable with select (Xpath query)"
-<xsl:variable name="$1"
-  select="${VISUAL}$2" />
-endsnippet
-
+# -----------------------------------------------------------------
+# Visual Trigger:  sort
+# Description:     Inserts an <xsl:sort> element, used inside
+#                  <xsl:for-each> or <xsl:apply-templates> to control
+#                  the processing order of the selected nodes.
+# Workflow:
+#   1. Inside a for-each or apply-templates, select the sort key
+#      (an XPath expression relative to the items being iterated).
+#   2. Press ctrl-j, then type "sort".
+#   3. The `select` attribute is filled in. You are prompted to choose
+#      the sort `order` (ascending or descending).
+# Result: A complete `<xsl:sort>` element.
+# -----------------------------------------------------------------
 snippet sort "Sort item for for-each"
 <xsl:sort select="${VISUAL}$1" order="$2`!p snip.rv=from_options(t[2], ['ascending', 'descending' ])`" />
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   number
+# Description:    Inserts a simple `<xsl:number />` element. By default,
+#                 it generates a number for the current node based on its
+#                 position among its siblings of the same name.
+# -----------------------------------------------------------------
 snippet number "Number a template"
 <xsl:number />
 endsnippet
 
-# to create sections:
-# <xsl:number level="multiple" count="*" />
-# or
-# <xsl:number level="multiple" count='dish|menu/*' />
-#
-# for numbers to continue from 1 through boundaries
-# <xsl:number level="any" />
-
-snippet numberd "Number a template"
+# -----------------------------------------------------------------
+# Text Trigger:   numberd
+# Description:    Inserts a detailed <xsl:number> element with `level`
+#                 and `count` attributes for advanced numbering schemes,
+#                 such as multi-level section numbers (e.g., 1.1, 1.2).
+# Workflow:
+#   1. Type "numberd" and press ctrl-j.
+#   2. Choose the numbering `level` from the interactive list.
+#   3. Specify the `count` pattern (e.g., `chapter|section`).
+# Result: A detailed `<xsl:number>` element for structured numbering.
+# -----------------------------------------------------------------
+snippet numberd "Detailed Numbering"
 <xsl:number level="$1`!p snip.rv=from_options(t[1], ['single', 'any', 'multiple' ])`" count="$0" />
 endsnippet
 
-# <xsl:number level="multiple" count='*' from="menu/* />
-# format:
-#  1
-#  01
-#  a (any letter to start at)
-#  A (any letter to start at)
-#  i
-#  I
-# example:
-# <xsl:number level="multiple" count='*' from="menu/* token='1.a' />
-# <xsl:number level="multiple" count='*' from="menu/* token='1-I' />
-
-snippet numberdd "Number a template"
+# -----------------------------------------------------------------
+# Text Trigger:   numberdd
+# Description:    Inserts a highly detailed <xsl:number> element with
+#                 `level`, `count`, `from`, and `format` attributes. This
+#                 allows for complex numbering schemes like "A.1(i)".
+# Workflow:
+#   1. Type "numberdd" and press ctrl-j.
+#   2. Fill in the `level`, `count`, `from` (where numbering restarts),
+#      and `format` (e.g., '1.a-I') attributes.
+# Result: A complex `<xsl:number>` element for custom-formatted numbering.
+# -----------------------------------------------------------------
+snippet numberdd "Formatted and Detailed Numbering"
 <xsl:number level="$1`!p snip.rv=from_options(t[1], ['single', 'any', 'multiple'
 ])`" count="$2" from="$3" format="$4"/>
 endsnippet
 
-# keys
-#
-# XML:
-# ...
-# <car:cars ... />
-#   <car:model car:name="Golf" m:id="VW" car:year="2001" />
-# ...
-#
-# <car:cars ... />
-#   <m:manufacturers>
-#     <m:manufacturer m:id="VW" m:name="Volkswagen" m:country='Germany' />
-#  ...
-#
-# XSLT:
-# <xsl:key name="mfc" match="m:manufacturer" use='@m:id' />
-#
-# to use it in(context: car:cars/car:models):
-#
-# <xsl:value-of select="key('mfc', @m:id)/@m.name" />
-#
-# In the above we use the @m:id in the car:cars/car:models to get the
-# data from car:cars/m:manufacturer, then get its @m.name; "Volkwagen"
+# -----------------------------------------------------------------
+# Text Trigger:   key
+# Description:    Defines an <xsl:key>, which creates an efficient,
+#                 indexed lookup for nodes in the source document. Using
+#                 `key()` is much faster than searching with XPath (e.g., `//...`)
+#                 repeatedly inside a loop.
+# Workflow:
+#   1. At the top level of the stylesheet, type "key" and press ctrl-j.
+#   2. Enter a `name` for the key.
+#   3. Enter a `match` pattern for the nodes you want to index.
+#   4. Enter a `use` expression for the value to use as the key's lookup value.
+# Result: An `<xsl:key>` definition. A comment is included to show
+#         how to use it with the `key()` function.
+# -----------------------------------------------------------------
 snippet key "Add a key"
 <xsl:key name="$1" match="$2" use="$3" />
 <!-- to use: key('$1', $3) -->
 endsnippet
 
+# -----------------------------------------------------------------
+# Text/Visual Trigger:  message
+# Description:          Inserts an <xsl:message> element. This writes its
+#                       content to the system's standard error or console
+#                       during transformation, which is invaluable for
+#                       debugging values and execution flow.
+# Workflow:
+#   1. Type "message" and press ctrl-j.
+#   2. Or, select text to output and trigger the snippet.
+# Result: An <xsl:message> block.
+# -----------------------------------------------------------------
 snippet "(.)?message" "Write a message to the terminal" r
 <xsl:message>
   ${VISUAL}$1
 </xsl:message>
 endsnippet
 
+# -----------------------------------------------------------------
+# Visual Trigger:  fn
+# Description:     Creates a user-defined <xsl:function> in a custom
+#                  public namespace (`lfn:`). Functions can be called
+#                  from any XPath expression in the stylesheet.
+# Workflow:
+#   1. Select the name for your function in visual mode.
+#   2. Press ctrl-j, then type "fn".
+#   3. The `name` is filled in. Specify the return type in the `as` attribute.
+#   4. The snippet stages the `param` snippet for you to add parameters.
+# Result: A complete function skeleton.
+# -----------------------------------------------------------------
 snippet fn "Write an XPath function"
 <xsl:function name="lfn:${VISUAL}$1" as="${2:xs:string}">
   param$0
 </xsl:function>
 endsnippet
 
+# -----------------------------------------------------------------
+# Visual Trigger:  private-fn
+# Description:     Creates a user-defined <xsl:function> in a custom
+#                  private namespace (`private-lfn:`), indicating it is
+#                  intended for internal use within the stylesheet.
+# Workflow:
+#   1. Select the name for your function in visual mode.
+#   2. Press ctrl-j, then type "private-fn".
+#   3. The `name` is filled in. Specify the return type in the `as` attribute.
+#   4. The snippet stages the `param` snippet for you to add parameters.
+# Result: A complete private function skeleton.
+# -----------------------------------------------------------------
 snippet private-fn "Write a private XPath function"
 <xsl:function name="private-lfn:${VISUAL}$1" as="${2:xs:string}">
   param$0
 </xsl:function>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   evaluate
+# Description:    Inserts an <xsl:evaluate> instruction (XSLT 3.0). This
+#                 allows for the dynamic execution of an XPath expression
+#                 that has been constructed as a string.
+# Workflow:
+#   1. Type "evaluate" and press ctrl-j.
+#   2. Provide the `context-item` for the evaluation.
+#   3. Provide the `xpath` expression string to be executed.
+# Result: An <xsl:evaluate> element.
+# -----------------------------------------------------------------
 snippet evaluate "Write an evaluation function"
 <xsl:evaluate context-item="${1:.}" xpath="$2"></xsl:evaluate>
 endsnippet
 
+# -----------------------------------------------------------------
+# Visual Trigger:  analyze
+# Description:     Inserts an <xsl:analyze-string> block to perform
+#                  regular expression matching on a string, with different
+#                  handling for matching and non-matching parts.
+# Workflow:
+#   1. Select the string or XPath expression to analyze.
+#   2. Press ctrl-j, then type "analyze".
+#   3. Provide the regular expression in the `regex` attribute.
+#   4. Fill in the logic for `<xsl:matching-substring>` and
+#      `<xsl:non-matching-substring>`.
+# Result: A complete `<xsl:analyze-string>` structure.
+# -----------------------------------------------------------------
 snippet analyze "Analyze a string"
 <xsl:analyze-string select="${VISUAL}$1" regex="($2)" >
   <xsl:matching-substring>
@@ -517,12 +1358,32 @@ snippet analyze "Analyze a string"
 </xsl:analyze-string>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   matching
+# Description:    Inserts an <xsl:matching-substring> block. This is used
+#                 inside `<xsl:analyze-string>` to define the output for
+#                 the parts of the string that successfully match the regex.
+# Workflow:
+#   1. Inside an `<xsl:analyze-string>` block, type "matching" and press ctrl-j.
+# Result: An `<xsl:matching-substring>` block.
+# -----------------------------------------------------------------
 snippet matching "Create a matching substring snippet"
 <xsl:matching-substring>
   $1
 </xsl:matching-substring>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   map
+# Description:    Creates an XSLT 3.0 map (a key-value store) and
+#                 assigns it to a variable.
+# Workflow:
+#   1. Type "map" and press ctrl-j.
+#   2. Provide a `name` for the variable that will hold the map.
+#   3. The snippet stages the `map-entry` snippet for you to begin
+#      populating the map.
+# Result: An `<xsl:variable>` containing an `<xsl:map>`.
+# -----------------------------------------------------------------
 snippet map "create a map"
 <xsl:variable name="$1">
   <xsl:map>
@@ -532,20 +1393,47 @@ snippet map "create a map"
 </xsl:variable>
 endsnippet
 
+# -----------------------------------------------------------------
+# Text Trigger:   map-entry
+# Description:    Inserts an <xsl:map-entry> to define a single key-value
+#                 pair inside an <xsl:map>.
+# Workflow:
+#   1. Inside an `<xsl:map>`, type "map-entry" and press ctrl-j.
+#   2. Provide the `key` (usually as a string literal, e.g., `'my-key'`).
+#   3. Provide the `select` expression for the value.
+#   4. The snippet stages another `map-entry` for quick insertion.
+# Result: An `<xsl:map-entry>` element.
+# -----------------------------------------------------------------
 snippet map-entry "create a map entry"
 <xsl:map-entry key="'$1'" select="$2" />
 map-entry$0
 endsnippet
 
-snippet seqf "create a sequence"
+# -----------------------------------------------------------------
+# Text Trigger:   sequence-for-each
+# Description:    Creates a sequence of items by iterating over a node-set
+#                 with `<xsl:for-each>` and using `<xsl:sequence>` to add
+#                 one or more items to the result for each iteration.
+# Workflow:
+#   1. Type "sequence-for-each" and press ctrl-j.
+#   2. Provide the input node-set for the `for-each`.
+#   3. Provide the `select` expression for the `sequence`.
+# Result: A for-each loop that constructs a flat sequence.
+# -----------------------------------------------------------------
+snippet sequence-for-each "create a sequence from a for-each"
 <xsl:for-each select="$1">
    <xsl:sequence select="$2" />
 </xsl:for-each>
 endsnippet
 
-snippet seq "create a sequence"
+# -----------------------------------------------------------------
+# Text Trigger:   sequence
+# Description:    Inserts an `<xsl:sequence>` instruction. This is used
+#                 to return items (nodes, atomic values) to a sequence
+#                 without wrapping them in a document node, which is
+#                 often the default behavior. It's essential for
+#                 returning raw values from functions.
+# -----------------------------------------------------------------
+snippet sequence "create a sequence"
 <xsl:sequence select="$1" />
 endsnippet
-
-
-

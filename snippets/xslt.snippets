@@ -186,13 +186,7 @@ snippet start "Setting up the top of the file"
 $4`!p snip.rv=from_options(t[4], ['usage', 'program-param'])`
 
 strip$0
-<!--
-# XSLT 3.0
-# shallow-skip: causes all node that are not matched (including text nodes)
-#               to be skipped
-# fail:         treats a no-match as an error
-# true:         results in a warning
--->
+
 mode3
 
 template
@@ -271,6 +265,9 @@ endsnippet
 #   3. You will be prompted with a list of choices for the
 #      `on-no-match` attribute:
 #        - shallow-skip: Skips unmatched nodes but still processes their children.
+#        - shallow-copy: Copies the current node (without attributes) and
+#                        applies template to it's children, effectively
+#                        implementing an identity transform on unmatched nodes.
 #        - fail:         Throws an error, stopping the transformation.
 #        - true:         Issues a warning but continues processing.
 #   4. Select your desired behavior and complete the snippet.
@@ -279,8 +276,78 @@ endsnippet
 #         for handling unmatched nodes.
 # -----------------------------------------------------------------
 snippet mode3 "Set the mode for the spreadsheet"
+<!--
+  A DEVELOPER'S GUIDE to <xsl:mode on-no-match="..."> in XSLT 3.0
+
+  This attribute sets the global, default rule for what happens when the processor
+  encounters a node that does not have a specific <xsl:template match="..."> for it.
+  Think of it as the "catch-all" behavior for your entire transformation.
+
+
+  on-no-match="shallow-copy" (The "Smart Identity Transform")
+
+    - What it Does: Copies the current node and all its attributes, then continues
+                    processing its children.
+    - Use it when: You want to copy most of an XML document as-is, while only
+                   writing specific templates for the few things you want to change.
+                   This is the most common and useful mode for transformations.
+    - Analogy: A smart photocopier that copies the current page's layout and
+               headers, then processes the content inside.
+
+
+  on-no-match="shallow-skip" (The "Unboxer")
+
+    - What it Does: Ignores the current node (doesn't copy it) but continues
+                    to process its children.
+    - Use it when: You want to get rid of a wrapper or container element, but
+                   keep all the content that was inside it.
+                   (This mimics the default behavior for elements in XSLT 1.0).
+    - Analogy: You throw away the box but keep the items that were inside it.
+
+
+  on-no-match="deep-copy" (The "Perfect Clone")
+
+    - What it Does: Makes a complete, verbatim copy of the current node AND all
+                    of its descendants (children, grandchildren, etc.). No further
+                    templates are applied to anything inside it.
+    - Use it when: You want to grab an entire section of the XML and transfer it
+                   to the output without any changes whatsoever.
+    - Analogy: Like using a 3D printer to clone a complex object perfectly.
+               (This is equivalent to using <xsl:copy-of select="."/>).
+
+
+  on-no-match="deep-skip" (The "Pruning Shears")
+
+    - What it Does: Deletes the current node and its entire subtree. Nothing is
+                    copied, and nothing inside it is processed further.
+    - Use it when: You need to completely remove entire sections of the source
+                   document (e.g., delete all <debug-info> or <comment> blocks).
+    - Analogy: Pruning a dead branch off a tree.
+
+
+  on-no-match="text-only-copy" (The "Content Extractor")
+
+    - What it Does: Ignores all element tags and copies only the text content
+                    from the current node and all of its descendants.
+    - Use it when: You need to extract the raw string value from a complex piece
+                   of XML, stripping out all the structural tags.
+                   (This mimics the confusing overall default behavior of XSLT 1.0).
+    - Analogy: Highlighting a chapter in a book and copying only the words.
+
+
+  on-no-match="fail" (The "Strict Guard")
+
+    - What it Does: Throws a dynamic error and stops the transformation immediately.
+    - Use it when: You want to enforce a very strict transformation. If the stylesheet
+                   encounters any element it wasn't explicitly designed to handle,
+                   it should crash loudly instead of failing silently.
+    - Analogy: An "assert" that fails if unexpected data appears.
+
+
+  Choosing the right mode is key to writing clean, declarative XSLT 3.0.
+-->
 <xsl:mode on-no-match="$1`!p snip.rv=from_options(t[1], [
-'shallow-skip', 'fail', 'true'
+'shallow-skip', 'shallow-copy', 'fail', 'true'
 ])`" />
 endsnippet
 
